@@ -8,7 +8,10 @@ import { createHash } from 'node:crypto';
 import Parser from 'rss-parser';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { kirjaaLahteet, kirjaaVirheet, luePoistot, onPoistettu } from './yhteiset.mjs';
 
+const TILA = [];     // lähteiden tila ylläpitonäkymään
+const VIRHEET = [];
 const UA = 'pelicans-kooste/1.0 (yksityinen sovellus)';
 const SAILYTYS_PV = 30;
 const MAX_KOHTEITA = 300; // pitää Firestore-dokumentin reilusti alle 1 Mt:n myös tiivistelmien kanssa
@@ -138,11 +141,13 @@ async function paivitaUutiset() {
   const nyt = Date.now();
   let lisatty = 0, korvattu = 0;
   const virheet = [];
+  const poistot = await luePoistot(db);
 
   for (const lahde of LAHTEET) {
     try {
-      const uudet = await keraaLahde(lahde);
+      const uudet = (await keraaLahde(lahde)).filter((u) => !onPoistettu(poistot, u));
       console.log(`${lahde.id}: ${uudet.length} Pelicans-kohdetta`);
+      TILA.push({ id: lahde.id, nimi: lahde.nimi, ok: true, maara: uudet.length, aika: Date.now() });
       // Pelicans.fi:n ensimmäisellä kerralla vanhoja tiedotteita ei merkitä uusiksi eikä nosteta listan kärkeen
       const ekaKerta = lahde.tapa === 'pelicansfi' && !kohteet.some((k) => k.lahde === 'Pelicans.fi');
       for (const u of uudet) {
@@ -166,6 +171,8 @@ async function paivitaUutiset() {
       }
     } catch (e) {
       virheet.push(`${lahde.id}: ${e.message}`);
+      VIRHEET.push(`${lahde.nimi} (${lahde.id}): ${e.message}`);
+      TILA.push({ id: lahde.id, nimi: lahde.nimi, ok: false, maara: 0, virhe: e.message, aika: Date.now() });
       console.warn(`⚠ ${lahde.id}: ${e.message}`);
     }
   }
@@ -173,7 +180,7 @@ async function paivitaUutiset() {
   const raja = nyt - SAILYTYS_PV * 864e5;
   const ennen = kohteet.length;
   const siivottu = kohteet
-    .filter((k) => k.aika >= raja)
+    .filter((k) => k.aika >= raja && !onPoistettu(poistot, k))
     .sort((a, b) => b.aika - a.aika)
     .slice(0, MAX_KOHTEITA);
   const poistettu = ennen - siivottu.length;
@@ -283,7 +290,7 @@ async function haeSuomi24Lista(url) {
 
 async function tutkiKetju(linkki) {
   const teksti = puhdas(await hae(linkki));
-  const maininnat = (teksti.match(/pelicans/gi) || []).length;
+  const maininnat = (teksti.match(/pelicans|pelsu/gi) || []).length;
   // Muutoksen tunniste: sivun teksti ilman numeroita (suhteelliset ajat yms. eivät aiheuta turhia muutoksia)
   const tila = hajautus(teksti.replace(/\d+/g, ''));
   return { maininnat, tila };
@@ -304,9 +311,18 @@ async function paivitaKeskustelut() {
       console.log(`Suomi24 ${osasto}: ${lista.length} ketjua listalla`);
       console.log('  esim:', lista.slice(0, 5).map((k) => k.otsikko).join(' | '));
       ehdokkaat.push(...lista);
-    } catch (e) { console.warn(`⚠ Suomi24 ${osasto}: ${e.message}`); }
+      TILA.push({ id: 'suomi24', nimi: 'Suomi24', ok: lista.length > 0, maara: lista.length,
+        virhe: lista.length ? null : 'Listalta ei löytynyt ketjuja', aika: Date.now() });
+    } catch (e) {
+      console.warn(`⚠ Suomi24 ${osasto}: ${e.message}`);
+      VIRHEET.push(`Suomi24: ${e.message}`);
+      TILA.push({ id: 'suomi24', nimi: 'Suomi24', ok: false, maara: 0, virhe: e.message, aika: Date.now() });
+    }
   }
 
+  const poistot = await luePoistot(db);
+  for (const id of poistot.ids) ketjut.delete(id);
+  ehdokkaat = ehdokkaat.filter((k) => !poistot.ids.has('s24-' + k.id));
   const omat = ehdokkaat.filter((k) => onPelicans(k.otsikko));
   const muut = ehdokkaat.filter((k) => !onPelicans(k.otsikko) && yleiset.test(k.otsikko));
   const tutkittavat = [...omat, ...muut].slice(0, asetus.maxKetjuja);
@@ -342,6 +358,16 @@ async function paivitaKeskustelut() {
 // ---------- Ajo ----------
 let virhe = false;
 for (const [nimi, fn] of [['uutiset', paivitaUutiset], ['ottelut', paivitaOttelut], ['keskustelut', paivitaKeskustelut]]) {
-  try { await fn(); } catch (e) { virhe = true; console.error(`✗ ${nimi}:`, e); }
+  try {
+    await fn();
+    if (nimi === 'ottelut') TILA.push({ id: 'liiga', nimi: 'Liiga (ottelut ja taulukko)', ok: true, maara: null, aika: Date.now() });
+  } catch (e) {
+    virhe = true;
+    console.error(`✗ ${nimi}:`, e);
+    VIRHEET.push(`${nimi}: ${e.message}`);
+    if (nimi === 'ottelut') TILA.push({ id: 'liiga', nimi: 'Liiga (ottelut ja taulukko)', ok: false, virhe: e.message, aika: Date.now() });
+  }
 }
+await kirjaaLahteet(db, TILA);
+await kirjaaVirheet(db, 'keräys', VIRHEET);
 process.exit(virhe ? 1 : 0);

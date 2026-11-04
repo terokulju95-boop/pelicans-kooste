@@ -112,6 +112,75 @@
   .s-ps { background: var(--oranssi); } .s-pu { background: var(--tappio); }
 
   .tiivis { font-size: 16.5px; line-height: 1.55; }
+  /* Tagit, suodattimet, asiaotsikko */
+  .asiaotsikko { color: var(--turkoosi); font-size: 14.5px; margin-top: 4px; line-height: 1.35; }
+  .asiaotsikko::before { content: "✦ "; font-size: 11px; }
+  .tagit { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tagi { background: var(--kortti2); border: 1px solid var(--raja); color: #C3CED6; border-radius: 999px;
+    padding: 3px 10px; font-size: 12.5px; cursor: pointer; }
+  .tagi.pelaaja::before { content: "👤 "; font-size: 10px; }
+  .tagi.l-siirto { border-color: rgba(245,154,27,.6); color: var(--oranssi); }
+  .tagi.l-otteluraportti { border-color: rgba(51,193,212,.6); color: var(--turkoosi); }
+  .tagi.l-loukkaantuminen { border-color: rgba(229,83,75,.6); color: #F08A84; }
+  .tagi.l-kolumni { border-color: #6E7FA8; color: #AEB9D6; }
+  .sirut { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; margin: 0 -2px; scrollbar-width: none; }
+  .siru { flex: none; background: var(--kortti); border: 1px solid var(--raja); color: var(--teksti); border-radius: 999px;
+    padding: 7px 13px; font-size: 14px; cursor: pointer; }
+  .siru small { color: var(--harmaa); margin-left: 3px; }
+  .siru.valittu { background: var(--turkoosi); color: #00151A; border-color: var(--turkoosi); }
+  .siru.valittu small { color: #00151A; }
+  .suodatinrivi { display: flex; align-items: center; gap: 10px; margin: 8px 4px; flex-wrap: wrap; }
+  h2.paivaotsikko { color: var(--turkoosi); font-size: 13px; margin-top: 18px; }
+
+  /* Kompakti lista */
+  body.kompakti .kortti.klikattava { padding: 10px 14px; margin-bottom: 6px; border-radius: 10px; }
+  body.kompakti .kortti .otsikko { font-size: 15.5px; font-weight: 500; }
+  body.kompakti .kortti .meta { margin-top: 4px; font-size: 12px; }
+
+  /* Lukunäkymän lisät */
+  .pituusnappi { float: right; background: none; border: 1px solid var(--raja); color: var(--harmaa); border-radius: 8px;
+    font-size: 12px; padding: 2px 8px; text-transform: none; letter-spacing: 0; cursor: pointer; }
+  .poistonappi { display: block; width: 100%; margin-top: 10px; background: none; border: 1px solid var(--raja);
+    color: var(--harmaa); border-radius: 12px; padding: 12px; cursor: pointer; font-size: 15px; }
+  .poistonappi.varmista { border-color: var(--tappio); color: var(--tappio); font-weight: 600; }
+
+  /* Pikalinkit */
+  .pikalinkit { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pikalinkki { background: var(--kortti); border: 1px solid var(--raja); border-radius: 12px; padding: 10px 14px; font-weight: 600; }
+
+  /* Asetukset ja ylläpito */
+  .takaisin { background: none; border: 0; color: var(--turkoosi); font-size: 16px; padding: 6px 2px; cursor: pointer; }
+  .asetuskortti { padding: 4px 14px; }
+  .asetuskortti .rivi { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0;
+    border-bottom: 1px solid var(--raja); width: 100%; }
+  .asetuskortti .rivi:last-child { border-bottom: 0; }
+  .rivinappi { background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .kytkin { width: 22px; height: 22px; accent-color: var(--turkoosi); }
+  .valinta { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .valinta input { width: 20px; height: 20px; accent-color: var(--turkoosi); }
+  .nuolet { display: flex; gap: 6px; }
+  .nuolet button, .pieni { background: var(--kortti2); border: 1px solid var(--raja); color: var(--teksti); border-radius: 8px;
+    min-width: 36px; height: 34px; cursor: pointer; padding: 0 10px; }
+  .nuolet button:disabled { opacity: .3; }
+  .valitsin { display: inline-flex; border: 1px solid var(--raja); border-radius: 10px; overflow: hidden; }
+  .valitsin button { background: none; border: 0; color: var(--teksti); padding: 7px 14px; cursor: pointer; }
+  .valitsin button.valittu { background: var(--turkoosi); color: #00151A; font-weight: 700; }
+  .linkkinimi { display: flex; flex-direction: column; min-width: 0; }
+  .linkkinimi small { color: var(--harmaa); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+  .linkkilomake { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; }
+  .lahderivi { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--raja); }
+  .lahderivi .ok { color: var(--voitto); font-weight: 700; } .lahderivi .vika { color: var(--tappio); font-weight: 700; }
+  .lnimi { flex: 1; display: flex; flex-direction: column; } .lnimi small { color: var(--harmaa); font-size: 11.5px; }
+  .lmaara { color: var(--harmaa); font-variant-numeric: tabular-nums; }
+  .lvirhe { color: #F08A84; font-size: 13px; padding: 4px 0 8px 22px; }
+  .pylvaat { display: flex; align-items: flex-end; gap: 4px; height: 110px; margin-top: 12px; }
+  .pylvas { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+  .pylvas span { font-size: 10px; color: var(--harmaa); }
+  .palkki { width: 100%; min-height: 2px; background: var(--turkoosi); border-radius: 3px 3px 0 0; display: flex; flex-direction: column-reverse; overflow: hidden; }
+  .virhepalkki { background: var(--tappio); width: 100%; }
+  .virherivi { padding: 8px 0; border-bottom: 1px solid var(--raja); font-size: 14px; }
+  .virherivi small { display: block; color: var(--harmaa); font-size: 12px; }
+
   .viite { display: inline-flex; align-items: center; justify-content: center; min-width: 19px; height: 19px;
     padding: 0 5px; margin-left: 3px; border-radius: 6px; background: rgba(51,193,212,.16); color: var(--turkoosi);
     font-size: 11.5px; font-weight: 700; vertical-align: 2px; }
@@ -216,6 +285,8 @@
 
   <div class="valikko piilossa" id="valikko">
     <div class="info" id="valikkoinfo"></div>
+    <button id="avaaasetukset">Asetukset</button>
+    <button id="avaayllapito">Ylläpito</button>
     <button id="vaihdaprofiili">Vaihda käyttäjää</button>
     <button id="kirjauduulos">Kirjaudu ulos</button>
   </div>
@@ -226,6 +297,8 @@
     <section data-nakyma="huhut" class="piilossa"></section>
     <section data-nakyma="keskustelut" class="piilossa"></section>
     <section data-nakyma="ottelut" class="piilossa"></section>
+    <section data-nakyma="asetukset" class="piilossa"></section>
+    <section data-nakyma="yllapito" class="piilossa"></section>
   </main>
 
   <nav>
@@ -243,6 +316,8 @@
 </div>
 
 
+<div class="ilmoitus piilossa" id="ilmoitus"></div>
+
 <div id="lukunakyma" class="lukunakyma piilossa">
   <div class="tausta" data-sulje></div>
   <div class="arkki" role="dialog" aria-modal="true">
@@ -256,7 +331,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
   from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js';
-import { initializeFirestore, persistentLocalCache, doc, onSnapshot, getDoc, setDoc }
+import { initializeFirestore, persistentLocalCache, doc, onSnapshot, getDoc, setDoc, arrayUnion, arrayRemove }
   from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -361,6 +436,7 @@ async function kaynnista() {
   nayta('sovellus');
   $('#valikkoinfo').textContent = `Käyttäjä: ${PROFIILIT[lueProfiili()] || '?'}`;
   await aloitaIstunto();
+  await lataaAsetukset();
   lopetaKuuntelu();
   kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'kohteet'), (s) => {
     const d = s.data() || {};
@@ -376,6 +452,20 @@ async function kaynnista() {
     ketjut = s.data()?.ketjut || [];
     piirra();
   }, virheKuuntelussa));
+  kuuntelijat.push(onSnapshot(doc(db, 'yhteiset', 'poistot'), (s) => {
+    const d = s.data() || {};
+    poistot = { ids: new Set(d.ids || []), avaimet: new Set(d.avaimet || []) };
+    piirra();
+  }, () => {}));
+  kuuntelijat.push(onSnapshot(doc(db, 'yhteiset', 'pikalinkit'), (s) => {
+    pikalinkit = s.data()?.linkit || [];
+    piirra();
+    if (valittu === 'asetukset') piirraAsetukset();
+  }, () => {}));
+  kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'yllapito'), (s) => {
+    yllapito = s.data() || null;
+    if (valittu === 'yllapito') piirraYllapito();
+  }, () => {}));
   kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'tiivistelma'), (s) => {
     tiivistelma = s.data() || null;
     piirra();
@@ -402,28 +492,147 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// ---------- Valilehdet ----------
+// ---------- Asetukset (profiilikohtaiset) ----------
+const VALILEHDET = { kooste: 'Kooste', uutiset: 'Uutiset', huhut: 'Huhut', keskustelut: 'Keskustelut', ottelut: 'Ottelut' };
+const OSIOT = { ottelupaiva: 'Ottelupäiväkortti', paivan: 'Päivän Pelicans', seuraava: 'Seuraava ottelu',
+  huhut: 'Kuumimmat huhut', uutiset: 'Tuoreimmat uutiset', keskustelut: 'Kuumimmat keskustelut' };
+const OLETUS = { kompakti: false, pituus: 'lyhyt', paivaryhmat: true };
+function taydenna(a) {
+  const t = { ...OLETUS, ...(a || {}) };
+  for (const [kentta, kaikki] of [['valilehdet', VALILEHDET], ['osiot', OSIOT]]) {
+    const lista = (t[kentta] || []).filter((x) => kaikki[x.id]);
+    for (const id of Object.keys(kaikki)) if (!lista.some((x) => x.id === id)) lista.push({ id, nakyvissa: true });
+    t[kentta] = lista;
+  }
+  t.valilehdet.find((x) => x.id === 'kooste').nakyvissa = true;
+  return t;
+}
+const lueLocal = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+let asetukset = taydenna(null);
+
+async function lataaAsetukset() {
+  asetukset = taydenna(lueLocal('asetukset-' + lueProfiili()));
+  sovellaAsetukset();
+  try {
+    const s = await getDoc(profiiliRef());
+    if (s.exists() && s.data().asetukset) asetukset = taydenna(s.data().asetukset);
+  } catch {}
+  sovellaAsetukset();
+}
+function tallennaAsetukset() {
+  try { localStorage.setItem('asetukset-' + lueProfiili(), JSON.stringify(asetukset)); } catch {}
+  setDoc(profiiliRef(), { asetukset }, { merge: true }).catch(() => {});
+  sovellaAsetukset();
+  piirra();
+}
+function sovellaAsetukset() {
+  document.body.classList.toggle('kompakti', !!asetukset.kompakti);
+  const nav = $('nav');
+  for (const v of asetukset.valilehdet) {
+    const b = nav.querySelector(`[data-valilehti="${v.id}"]`);
+    b.classList.toggle('piilossa', !v.nakyvissa);
+    nav.appendChild(b);
+  }
+  if (VALILEHDET[valittu] && !asetukset.valilehdet.find((v) => v.id === valittu)?.nakyvissa) valitse('kooste');
+}
+
+// ---------- Välilehdet ja sivut ----------
 let valittu = 'kooste';
-$$('nav button').forEach((b) => b.addEventListener('click', () => {
-  valittu = b.dataset.valilehti;
-  $$('nav button').forEach((x) => x.classList.toggle('valittu', x === b));
-  $$('[data-nakyma]').forEach((s) => s.classList.toggle('piilossa', s.dataset.nakyma !== valittu));
+let edellinen = 'kooste';
+function valitse(nimi) {
+  if (VALILEHDET[nimi]) edellinen = nimi;
+  valittu = nimi;
+  $$('nav button').forEach((x) => x.classList.toggle('valittu', x.dataset.valilehti === nimi));
+  $$('[data-nakyma]').forEach((s) => s.classList.toggle('piilossa', s.dataset.nakyma !== nimi));
+  if (nimi === 'asetukset') piirraAsetukset();
+  if (nimi === 'yllapito') piirraYllapito();
   window.scrollTo(0, 0);
+}
+function avaaSivu(nimi) { history.pushState({ sivu: nimi }, ''); valitse(nimi); }
+$$('nav button').forEach((b) => b.addEventListener('click', () => {
+  if (!VALILEHDET[valittu]) { history.back(); setTimeout(() => valitse(b.dataset.valilehti), 30); return; }
+  valitse(b.dataset.valilehti);
 }));
 
 // ---------- Valikko ----------
 $('#valikkonappi').addEventListener('click', (e) => { e.stopPropagation(); $('#valikko').classList.toggle('piilossa'); });
 document.addEventListener('click', () => $('#valikko').classList.add('piilossa'));
+$('#avaaasetukset').addEventListener('click', () => avaaSivu('asetukset'));
+$('#avaayllapito').addEventListener('click', () => avaaSivu('yllapito'));
 $('#vaihdaprofiili').addEventListener('click', () => { tallennaProfiili(null); lopetaKuuntelu(); nayta('profiilivalinta'); });
 $('#kirjauduulos').addEventListener('click', () => { tallennaProfiili(null); signOut(auth); });
+
+// ---------- Ilmoitus (esim. "Poistettu – Peru") ----------
+let ilmoitusAjastin = null;
+function naytaIlmoitus(teksti, nappi, toiminto) {
+  const el = $('#ilmoitus');
+  el.innerHTML = `<span>${esc(teksti)}</span>${nappi ? `<button>${esc(nappi)}</button>` : ''}`;
+  el.classList.remove('piilossa');
+  if (nappi) el.querySelector('button').onclick = () => { toiminto(); el.classList.add('piilossa'); };
+  clearTimeout(ilmoitusAjastin);
+  ilmoitusAjastin = setTimeout(() => el.classList.add('piilossa'), 6000);
+}
+
+// ---------- Poistot (yhteiset molemmille) ----------
+let poistot = { ids: new Set(), avaimet: new Set() };
+const avain = (o) => String(o || '').toLowerCase().normalize('NFC').replace(/[^\p{L}\p{N} ]/gu, ' ').replace(/\s+/g, ' ').trim();
+const nakyvaUutinen = (k) => !poistot.ids.has(k.id) && !poistot.avaimet.has(avain(k.otsikko));
+const nakyvaKetju = (k) => !poistot.ids.has(k.id);
+
+function poista(laji, id) {
+  const k = etsiKohde(laji, id);
+  if (!k) return;
+  const ref = doc(db, 'yhteiset', 'poistot');
+  const lisaa = { ids: arrayUnion(k.id) };
+  const peru = { ids: arrayRemove(k.id) };
+  if (laji === 'u') { lisaa.avaimet = arrayUnion(avain(k.otsikko)); peru.avaimet = arrayRemove(avain(k.otsikko)); }
+  poistot.ids.add(k.id); // näkyy heti
+  if (laji === 'u') poistot.avaimet.add(avain(k.otsikko));
+  setDoc(ref, lisaa, { merge: true }).catch(() => naytaIlmoitus('Poisto epäonnistui – tarkista Firestoren säännöt'));
+  history.back();
+  piirra();
+  naytaIlmoitus(laji === 'u' ? 'Uutinen poistettu' : 'Keskustelu poistettu', 'Peru', () => {
+    poistot.ids.delete(k.id);
+    if (laji === 'u') poistot.avaimet.delete(avain(k.otsikko));
+    setDoc(ref, peru, { merge: true }).catch(() => {});
+    piirra();
+  });
+}
+
+// ---------- Suodattimet (luokka ja pelaaja) ----------
+const LUOKKA_NIMI = { otteluraportti: 'Otteluraportti', siirto: 'Siirto', loukkaantuminen: 'Loukkaantuminen',
+  talous: 'Talous', juniorit: 'Juniorit', kolumni: 'Kolumni', muu: 'Muu' };
+let suodatin = { luokka: null, pelaaja: null };
+function sovellaSuodatin(arvo) {
+  const [laji, ...loput] = arvo.split(':');
+  const x = loput.join(':');
+  if (laji === 'luokka') suodatin.luokka = suodatin.luokka === x ? null : (x || null);
+  if (laji === 'pelaaja') suodatin.pelaaja = x || null;
+  if (laji === 'tyhjenna') suodatin = { luokka: null, pelaaja: null };
+  if (valittu !== 'uutiset') valitse('uutiset');
+  piirra();
+  window.scrollTo(0, 0);
+}
 
 // ---------- Piirtäminen ----------
 const aiMerkki = (k) => k.tiiv && !k.tiiv.eiSaatavilla ? '<span class="ai">✦ Tiivistelmä</span>' : '';
 
+function tagit(k, max = 3) {
+  const osat = [];
+  if (k.luokka && k.luokka !== 'muu') osat.push(`<button class="tagi l-${k.luokka}" data-suodata="luokka:${k.luokka}">${LUOKKA_NIMI[k.luokka]}</button>`);
+  for (const p of (k.pelaajat || []).slice(0, max)) osat.push(`<button class="tagi pelaaja" data-suodata="pelaaja:${esc(p)}">${esc(p)}</button>`);
+  return osat.length ? `<div class="tagit">${osat.join('')}</div>` : '';
+}
+const asiaRivi = (k) => k.asiaotsikko && avain(k.asiaotsikko) !== avain(k.otsikko)
+  ? `<div class="asiaotsikko">${esc(k.asiaotsikko)}</div>` : '';
+
 function uutisKortti(k) {
+  const komp = asetukset.kompakti;
   return `<div class="kortti klikattava${onUusi(k) ? ' uusi' : ''}" data-avaa="u:${esc(k.id)}" role="button" tabindex="0">
     <div class="otsikko">${esc(k.otsikko)}</div>
-    ${k.kuvaus ? `<div class="kuvaus">${esc(k.kuvaus)}</div>` : ''}
+    ${komp ? '' : asiaRivi(k)}
+    ${!komp && k.kuvaus ? `<div class="kuvaus">${esc(k.kuvaus)}</div>` : ''}
+    ${komp ? '' : tagit(k)}
     <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>${aikaTeksti(k.aika)}</span>
       ${k.maksumuuri ? '<span class="lukko" title="Voi olla maksumuurin takana">🔒</span>' : ''}${aiMerkki(k)}</div>
   </div>`;
@@ -431,6 +640,7 @@ function uutisKortti(k) {
 
 // ---------- Lukunäkymä: tekoälyn tiivistelmä + linkki alkuperäiseen ----------
 let avoinna = null; // { laji: 'u' | 'k', id }
+let pitkaAuki = null; // käyttäjän valinta tässä näkymässä (muuten asetus)
 
 function etsiKohde(laji, id) {
   return laji === 'u' ? kohteet.find((k) => k.id === id) : ketjut.find((k) => k.id === id);
@@ -442,11 +652,14 @@ function piirraLukunakyma() {
   if (!k) { suljeLukunakyma(); return; }
   const ketju = avoinna.laji === 'k';
   const t = k.tiiv;
+  const pitka = pitkaAuki ?? (asetukset.pituus === 'pitka');
   let runko;
   if (t && !t.eiSaatavilla) {
+    const lyhyt = t.lyhyt || String(t.teksti || '').split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
     runko = `
-      <div class="luku-otsake">✦ ${ketju ? 'Keskustelun tiivistelmä' : 'Tekoälyn tiivistelmä'}</div>
-      <p class="luku-teksti">${esc(t.teksti)}</p>
+      <div class="luku-otsake">✦ ${ketju ? 'Keskustelun tiivistelmä' : 'Tekoälyn tiivistelmä'}
+        <button class="pituusnappi" data-pituus-vaihto>${pitka ? 'Lyhyempi' : 'Pidempi'}</button></div>
+      <p class="luku-teksti">${esc(pitka ? t.teksti : lyhyt)}</p>
       ${t.pointit?.length ? `<div class="luku-otsake">${ketju ? 'Puheenaiheet' : 'Tärkeimmät tiedot'}</div>
         <ul class="pointit">${t.pointit.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
       ${t.vajaa ? `<div class="huom">${ketju ? 'Ketjussa on vähän Pelicansia koskevaa keskustelua.' : 'Juttu on osittain maksumuurin takana – tiivistelmä perustuu jutun alkuun.'}</div>` : ''}
@@ -464,9 +677,26 @@ function piirraLukunakyma() {
       <span>${ketju ? 'uutta ' + aikaTeksti(k.muuttunut) : aikaTeksti(k.aika)}</span>
       ${k.maksumuuri ? '<span class="lukko">🔒</span>' : ''}</div>
     <h3 class="luku-otsikko">${esc(k.otsikko)}</h3>
+    ${asiaRivi(k)}
+    ${tagit(k, 6)}
     ${runko}
-    <a class="nappi linkkinappi" href="${esc(k.linkki)}" target="_blank" rel="noopener">${ketju ? 'Avaa keskustelu' : 'Avaa alkuperäinen juttu'} ↗</a>`;
+    <a class="nappi linkkinappi" href="${esc(k.linkki)}" target="_blank" rel="noopener">${ketju ? 'Avaa keskustelu' : 'Avaa alkuperäinen juttu'} ↗</a>
+    <button class="poistonappi" data-poista>🗑 Poista ${ketju ? 'keskustelu' : 'uutinen'}</button>`;
 }
+$('#lukusisalto').addEventListener('click', (e) => {
+  if (e.target.closest('[data-pituus-vaihto]')) {
+    pitkaAuki = !(pitkaAuki ?? (asetukset.pituus === 'pitka'));
+    piirraLukunakyma();
+  } else if (e.target.closest('[data-poista]')) {
+    const nappi = e.target.closest('[data-poista]');
+    if (!nappi.dataset.varmista) { nappi.dataset.varmista = '1'; nappi.textContent = 'Vahvista poisto – ei palaa haussa'; nappi.classList.add('varmista'); return; }
+    poista(avoinna.laji, avoinna.id);
+  } else if (e.target.closest('[data-suodata]')) {
+    const arvo = e.target.closest('[data-suodata]').dataset.suodata;
+    history.back();
+    setTimeout(() => sovellaSuodatin(arvo), 40);
+  }
+});
 
 function avaaLukunakyma(laji, id) {
   avoinna = { laji, id };
@@ -477,12 +707,18 @@ function avaaLukunakyma(laji, id) {
 }
 function suljeLukunakyma() {
   avoinna = null;
+  pitkaAuki = null;
   $('#lukunakyma').classList.add('piilossa');
   document.body.style.overflow = '';
 }
-window.addEventListener('popstate', () => { if (avoinna) suljeLukunakyma(); });
+window.addEventListener('popstate', () => {
+  if (avoinna) suljeLukunakyma();
+  else if (!VALILEHDET[valittu]) valitse(edellinen);
+});
 $('#lukunakyma').addEventListener('click', (e) => { if (e.target.closest('[data-sulje]')) history.back(); });
 $('main').addEventListener('click', (e) => {
+  const s = e.target.closest('[data-suodata]');
+  if (s) { e.stopPropagation(); sovellaSuodatin(s.dataset.suodata); return; }
   const el = e.target.closest('[data-avaa]');
   if (!el || e.target.closest('a')) return;
   const [laji, ...id] = el.dataset.avaa.split(':');
@@ -591,15 +827,18 @@ function ottelupaivaKortti(o) {
 }
 
 // ---------- Sarjataulukko: rajat kaudelle 2026–27 (17 joukkuetta) ----------
-// 1–4 suoraan puolivälieriin, 5–12 pudotuspelien 1. kierros, 13–16 putoamissarja, 17. putoaa suoraan
-const SARJA = { suoraanPV: 4, pudotuspelit: 12, putoamissarja: 16 };
+// 1–4 suoraan puolivälieriin, 5–12 pudotuspelien 1. kierros (neljännesvälierät), kolme viimeistä putoaa suoraan
+const SARJA = { suoraanPV: 4, pudotuspelit: 12, putoavia: 3 };
 function taulukonRivi(r, i, kaikki) {
   const sija = Number(r.sija) || i + 1;
+  const ekaPutoava = kaikki.length - SARJA.putoavia + 1;
   const luokat = [/pelicans/i.test(r.joukkue) ? 'oma' : ''];
-  luokat.push(sija <= SARJA.suoraanPV ? 'pv' : sija <= SARJA.pudotuspelit ? 'pp' : sija <= SARJA.putoamissarja ? 'ps' : 'putoaa');
+  if (sija <= SARJA.suoraanPV) luokat.push('pv');
+  else if (sija <= SARJA.pudotuspelit) luokat.push('pp');
+  else if (sija >= ekaPutoava) luokat.push('putoaa');
   if (sija === SARJA.suoraanPV) luokat.push('raja-pv');
   if (sija === SARJA.pudotuspelit) luokat.push('raja-pp');
-  if (sija === SARJA.putoamissarja && kaikki.length > SARJA.putoamissarja) luokat.push('raja-ps');
+  if (sija === ekaPutoava - 1) luokat.push('raja-ps');
   return `<tr class="${luokat.join(' ')}"><td>${esc(sija)}</td><td>${esc(r.joukkue)}</td><td>${esc(r.ottelut ?? '')}</td><td>${esc(r.pisteet ?? '')}</td></tr>`;
 }
 
@@ -634,51 +873,87 @@ function huhuLinkit() {
 
 const tyhja = (otsikko, teksti) => `<div class="tyhja"><b>${otsikko}</b>${teksti}</div>`;
 
+// Päiväryhmittely: Tänään / Eilen / Aiemmin
+function paivaRyhma(t) {
+  const p = hkiPaiva(t);
+  if (p === hkiPaiva(Date.now())) return 'Tänään';
+  if (p === hkiPaiva(Date.now() - 864e5)) return 'Eilen';
+  return 'Aiemmin';
+}
+function ryhmitelty(lista, kortti, kentta = 'aika') {
+  if (!asetukset.paivaryhmat) return lista.map(kortti).join('');
+  let html = '', ed = null;
+  for (const k of lista) {
+    const r = paivaRyhma(k[kentta]);
+    if (r !== ed) { html += `<h2 class="paivaotsikko">${r}</h2>`; ed = r; }
+    html += kortti(k);
+  }
+  return html;
+}
+
+function pikalinkitHtml() {
+  if (!pikalinkit.length) return `<div class="vihje">Lisää Jatkoajan ketjut tai muut suosikkisivut pikalinkeiksi: valikko ⋮ → Asetukset → Pikalinkit.</div>`;
+  return `<div class="pikalinkit">${pikalinkit.map((l) =>
+    `<a class="pikalinkki" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.nimi)} ↗</a>`).join('')}</div>`;
+}
+
 function piirra() {
-  const uutiset = kohteet.filter((k) => k.tyyppi === 'uutinen').sort((a, b) => b.aika - a.aika);
+  const uutiset = kohteet.filter((k) => k.tyyppi === 'uutinen' && nakyvaUutinen(k)).sort((a, b) => b.aika - a.aika);
   const uusia = uutiset.filter(onUusi).length;
 
-  // Yläpalkki ja laskuri
+  // Yläpalkki ja laskurit
   if (paivitysAika) $('#paivitetty').textContent = `Päivitetty klo ${kello(paivitysAika)}`;
   const asetaLaskuri = (nimi, n) => {
     const l = $(`[data-laskuri="${nimi}"]`);
     l.textContent = n;
     l.classList.toggle('piilossa', !n);
   };
-  const ketjutJarj = [...ketjut].sort((a, b) => b.muuttunut - a.muuttunut);
+  const ketjutJarj = ketjut.filter(nakyvaKetju).sort((a, b) => b.muuttunut - a.muuttunut);
   asetaLaskuri('uutiset', uusia);
   asetaLaskuri('keskustelut', ketjutJarj.filter(ketjuUusi).length);
 
-  // Kooste
+  // Kooste: osiot asetusten mukaisessa järjestyksessä
   const paivan = paivanOttelu();
   const seuraava = ottelut?.tulevat?.find((o) => o.id !== paivan?.id);
-  $('[data-nakyma="kooste"]').innerHTML = `
-    ${paivan ? ottelupaivaKortti(paivan) : ''}
-    <h2>Päivän Pelicans</h2>
-    ${tiivistelmaKortti(tiivistelma?.uutiset)}
-    ${uusia ? `<div class="vihje">Edellisen käyntisi jälkeen on tullut <b>${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.</div>` : ''}
-    ${seuraava ? `<h2>Seuraava ottelu</h2>${otteluKortti(seuraava, true)}` : ''}
-    ${tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : ''}
-    <h2>Tuoreimmat uutiset</h2>
-    ${uutiset.slice(0, 3).map(uutisKortti).join('') || tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.')}
-    ${ketjutJarj.length ? `<h2>Kuumimmat keskustelut</h2>${ketjutJarj.slice(0, 3).map(ketjuKortti).join('')}` : ''}
-  `;
+  const osiot = {
+    ottelupaiva: paivan ? ottelupaivaKortti(paivan) : '',
+    paivan: `<h2>Päivän Pelicans</h2>${tiivistelmaKortti(tiivistelma?.uutiset)}
+      ${uusia ? `<div class="vihje">Edellisen käyntisi jälkeen on tullut <b>${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.</div>` : ''}`,
+    seuraava: seuraava ? `<h2>Seuraava ottelu</h2>${otteluKortti(seuraava, true)}` : '',
+    huhut: tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : '',
+    uutiset: `<h2>Tuoreimmat uutiset</h2>${uutiset.slice(0, 3).map(uutisKortti).join('') || tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.')}`,
+    keskustelut: ketjutJarj.length ? `<h2>Kuumimmat keskustelut</h2>${ketjutJarj.slice(0, 3).map(ketjuKortti).join('')}` : '',
+  };
+  $('[data-nakyma="kooste"]').innerHTML = asetukset.osiot.filter((o) => o.nakyvissa).map((o) => osiot[o.id]).join('');
 
-  // Uutiset
+  // Uutiset: suodattimet + päiväryhmät
+  const luokatMaarat = {};
+  for (const k of uutiset) if (k.luokka && k.luokka !== 'muu') luokatMaarat[k.luokka] = (luokatMaarat[k.luokka] || 0) + 1;
+  const suodatetut = uutiset.filter((k) => (!suodatin.luokka || k.luokka === suodatin.luokka)
+    && (!suodatin.pelaaja || (k.pelaajat || []).includes(suodatin.pelaaja)));
+  const sirut = Object.keys(luokatMaarat).length ? `<div class="sirut">
+      <button class="siru${!suodatin.luokka ? ' valittu' : ''}" data-suodata="luokka:">Kaikki</button>
+      ${Object.keys(LUOKKA_NIMI).filter((l) => luokatMaarat[l]).map((l) =>
+        `<button class="siru${suodatin.luokka === l ? ' valittu' : ''}" data-suodata="luokka:${l}">${LUOKKA_NIMI[l]} <small>${luokatMaarat[l]}</small></button>`).join('')}
+    </div>` : '';
+  const pelaajaRivi = suodatin.pelaaja ? `<div class="suodatinrivi">Pelaaja: <b>${esc(suodatin.pelaaja)}</b>
+      <button class="tagi" data-suodata="pelaaja:">✕ Poista suodatin</button></div>` : '';
   $('[data-nakyma="uutiset"]').innerHTML = uutiset.length
-    ? `<h2>Uutiset · ${uutiset.length}</h2>` + uutiset.map(uutisKortti).join('')
+    ? `${sirut}${pelaajaRivi}<h2>Uutiset · ${suodatetut.length}</h2>${ryhmitelty(suodatetut, uutisKortti) || tyhja('Ei osumia', 'Tällä suodattimella ei löytynyt uutisia.')}`
     : tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.');
 
-  // Huhut ja keskustelut (vaiheet 3–4)
+  // Huhut
   $('[data-nakyma="huhut"]').innerHTML = `
     <h2>Huhumylly</h2>
     ${tiivistelmaKortti(tiivistelma?.huhut, true)}
     ${tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : ''}
     ${ketjutJarj.length ? `<h2>Huhuja käsittelevät keskustelut</h2>${ketjutJarj.map(ketjuKortti).join('')}` : ''}
   `;
-  $('[data-nakyma="keskustelut"]').innerHTML = ketjutJarj.length
-    ? `<h2>Keskustelut · ${ketjutJarj.length}</h2>` + ketjutJarj.map(ketjuKortti).join('')
-    : tyhja('Ei aktiivisia keskusteluja', 'Pelicans-ketjut ilmestyvät tähän, kun palstoilla puhutaan Pelicansista.');
+
+  // Keskustelut + pikalinkit
+  $('[data-nakyma="keskustelut"]').innerHTML = `<h2>Pikalinkit</h2>${pikalinkitHtml()}` + (ketjutJarj.length
+    ? `<h2>Keskustelut · ${ketjutJarj.length}</h2>` + ryhmitelty(ketjutJarj, ketjuKortti, 'muuttunut')
+    : tyhja('Ei aktiivisia keskusteluja', 'Pelicans-ketjut ilmestyvät tähän, kun palstoilla puhutaan Pelicansista.'));
 
   // Ottelut
   if (!ottelut) {
@@ -693,16 +968,147 @@ function piirra() {
       ${taulukko ? `<h2>Sarjataulukko</h2><div class="kortti"><table>
         <thead><tr><th>#</th><th>Joukkue</th><th>O</th><th>P</th></tr></thead><tbody>${taulukko}</tbody></table>
         <div class="selite">
-          <span><i class="s-pv"></i>1–${SARJA.suoraanPV} suoraan puolivälieriin</span>
-          <span><i class="s-pp"></i>${SARJA.suoraanPV + 1}–${SARJA.pudotuspelit} pudotuspelit</span>
-          <span><i class="s-ps"></i>${SARJA.pudotuspelit + 1}–${SARJA.putoamissarja} putoamissarja</span>
-          ${rivit.length > SARJA.putoamissarja ? `<span><i class="s-pu"></i>${SARJA.putoamissarja + 1}. putoaa suoraan</span>` : ''}
+          <span><i class="s-pv"></i>1–${SARJA.suoraanPV} puolivälierät</span>
+          <span><i class="s-pp"></i>${SARJA.suoraanPV + 1}–${SARJA.pudotuspelit} neljännesvälierät</span>
+          <span><i class="s-pu"></i>${rivit.length - SARJA.putoavia + 1}–${rivit.length} putoaa</span>
         </div></div>` : ''}
     `;
   }
+  if (valittu === 'yllapito') piirraYllapito();
   piirraLukunakyma();
   hallitseLive();
 }
+
+// ---------- Asetukset-sivu ----------
+function jarjestysLista(kentta, nimet, lukittu = []) {
+  const lista = asetukset[kentta];
+  return lista.map((x, i) => `<div class="rivi">
+      <label class="valinta"><input type="checkbox" data-nakyvyys="${kentta}:${x.id}" ${x.nakyvissa ? 'checked' : ''} ${lukittu.includes(x.id) ? 'disabled' : ''}>
+        <span>${nimet[x.id]}</span></label>
+      <span class="nuolet">
+        <button data-siirra="${kentta}:${x.id}:-1" ${i === 0 ? 'disabled' : ''} aria-label="Ylös">↑</button>
+        <button data-siirra="${kentta}:${x.id}:1" ${i === lista.length - 1 ? 'disabled' : ''} aria-label="Alas">↓</button>
+      </span></div>`).join('');
+}
+
+function piirraAsetukset() {
+  $('[data-nakyma="asetukset"]').innerHTML = `
+    <button class="takaisin" data-takaisin>← Takaisin</button>
+    <h2>Näkymä</h2>
+    <div class="kortti asetuskortti">
+      <label class="rivi"><span>Kompakti lista</span><input type="checkbox" class="kytkin" data-asetus="kompakti" ${asetukset.kompakti ? 'checked' : ''}></label>
+      <label class="rivi"><span>Ryhmittely päivittäin</span><input type="checkbox" class="kytkin" data-asetus="paivaryhmat" ${asetukset.paivaryhmat ? 'checked' : ''}></label>
+      <div class="rivi"><span>Tiivistelmän pituus</span>
+        <span class="valitsin">
+          <button data-pituus="lyhyt" class="${asetukset.pituus === 'lyhyt' ? 'valittu' : ''}">Lyhyt</button>
+          <button data-pituus="pitka" class="${asetukset.pituus === 'pitka' ? 'valittu' : ''}">Pitkä</button>
+        </span></div>
+    </div>
+    <h2>Välilehdet</h2>
+    <div class="kortti asetuskortti">${jarjestysLista('valilehdet', VALILEHDET, ['kooste'])}</div>
+    <h2>Kooste-välilehden osiot</h2>
+    <div class="kortti asetuskortti">${jarjestysLista('osiot', OSIOT)}</div>
+    <h2>Pikalinkit (yhteiset)</h2>
+    <div class="kortti asetuskortti">
+      ${pikalinkit.map((l, i) => `<div class="rivi"><span class="linkkinimi">${esc(l.nimi)}<small>${esc(l.url)}</small></span>
+        <button class="pieni" data-poista-linkki="${i}">Poista</button></div>`).join('') || '<div class="vihje" style="margin:0">Ei vielä pikalinkkejä.</div>'}
+      <div class="linkkilomake">
+        <input id="linkkinimi" placeholder="Nimi, esim. Jatkoaika: Pelicans-ketju">
+        <input id="linkkiurl" type="url" placeholder="https://…">
+        <button class="nappi" data-lisaa-linkki>Lisää pikalinkki</button>
+      </div>
+    </div>
+    <h2>Muuta</h2>
+    <div class="kortti asetuskortti">
+      <button class="rivi rivinappi" data-avaa-sivu="yllapito"><span>Ylläpito ja lähteiden tila</span><span>›</span></button>
+    </div>`;
+}
+
+$('[data-nakyma="asetukset"]').addEventListener('change', (e) => {
+  const a = e.target.dataset.asetus;
+  if (a) { asetukset[a] = e.target.checked; tallennaAsetukset(); }
+  const n = e.target.dataset.nakyvyys;
+  if (n) {
+    const [kentta, id] = n.split(':');
+    asetukset[kentta].find((x) => x.id === id).nakyvissa = e.target.checked;
+    tallennaAsetukset();
+  }
+});
+$('[data-nakyma="asetukset"]').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.takaisin !== undefined) return history.back();
+  if (b.dataset.pituus) { asetukset.pituus = b.dataset.pituus; tallennaAsetukset(); piirraAsetukset(); }
+  if (b.dataset.siirra) {
+    const [kentta, id, suunta] = b.dataset.siirra.split(':');
+    const lista = asetukset[kentta];
+    const i = lista.findIndex((x) => x.id === id);
+    const j = i + Number(suunta);
+    if (j >= 0 && j < lista.length) { [lista[i], lista[j]] = [lista[j], lista[i]]; tallennaAsetukset(); piirraAsetukset(); }
+  }
+  if (b.dataset.lisaaLinkki !== undefined) {
+    const nimi = $('#linkkinimi').value.trim();
+    let url = $('#linkkiurl').value.trim();
+    if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+    try { new URL(url); } catch { return naytaIlmoitus('Tarkista osoite'); }
+    if (!nimi) return naytaIlmoitus('Anna pikalinkille nimi');
+    tallennaPikalinkit([...pikalinkit, { nimi: nimi.slice(0, 60), url }]);
+  }
+  if (b.dataset.poistaLinkki !== undefined) {
+    tallennaPikalinkit(pikalinkit.filter((_, i) => i !== Number(b.dataset.poistaLinkki)));
+  }
+  if (b.dataset.avaaSivu) { history.replaceState({ sivu: b.dataset.avaaSivu }, ''); valitse(b.dataset.avaaSivu); }
+});
+
+let pikalinkit = [];
+function tallennaPikalinkit(lista) {
+  pikalinkit = lista;
+  setDoc(doc(db, 'yhteiset', 'pikalinkit'), { linkit: lista }, { merge: true })
+    .catch(() => naytaIlmoitus('Tallennus epäonnistui – tarkista Firestoren säännöt'));
+  piirraAsetukset();
+  piirra();
+}
+
+// ---------- Ylläpito-sivu ----------
+let yllapito = null;
+function piirraYllapito() {
+  const y = yllapito || {};
+  const lahteet = y.lahteet || [];
+  const gem = y.gemini || {};
+  const paivat = [];
+  for (let i = 13; i >= 0; i--) paivat.push(new Date(Date.now() - i * 864e5).toLocaleDateString('sv-SE', { timeZone: 'Europe/Helsinki' }));
+  const maksimi = Math.max(1, ...paivat.map((p) => gem[p]?.kutsut || 0));
+  const tanaan = gem[paivat.at(-1)] || {};
+  const virheet = y.virheet || [];
+  $('[data-nakyma="yllapito"]').innerHTML = `
+    <button class="takaisin" data-takaisin>← Takaisin</button>
+    <h2>Keräys</h2>
+    <div class="kortti">
+      <div>Viimeisin keräys: <b>${y.keraysAika ? `${aikaTeksti(y.keraysAika)}` : 'ei tietoa'}</b></div>
+      <div class="vihje" style="margin:6px 0 0">Keräys ajetaan puolen tunnin välein klo 7–23. GitHubin ajastus voi myöhästyä 5–30 min.</div>
+    </div>
+    <h2>Lähteet</h2>
+    <div class="kortti">
+      ${lahteet.map((l) => `<div class="lahderivi"><span class="${l.ok ? 'ok' : 'vika'}">${l.ok ? '✓' : '✗'}</span>
+        <span class="lnimi">${esc(l.nimi)}<small>${esc(l.id)}</small></span>
+        <span class="lmaara">${l.ok ? (l.maara ?? '') : ''}</span></div>
+        ${!l.ok && l.virhe ? `<div class="lvirhe">${esc(l.virhe)}</div>` : ''}`).join('') || '<div class="vihje" style="margin:0">Tila päivittyy seuraavassa keräyksessä.</div>'}
+    </div>
+    <h2>Gemini-käyttö (14 pv)</h2>
+    <div class="kortti">
+      <div>Tänään: <b>${tanaan.kutsut || 0}</b> kutsua${tanaan.virheet ? `, joista <b style="color:var(--tappio)">${tanaan.virheet} epäonnistui</b>` : ''}</div>
+      <div class="pylvaat">${paivat.map((p) => {
+        const n = gem[p]?.kutsut || 0;
+        const v = gem[p]?.virheet || 0;
+        return `<div class="pylvas" title="${p}: ${n} kutsua, ${v} virhettä"><div class="palkki" style="height:${Math.round(n / maksimi * 100)}%">${v ? `<div class="virhepalkki" style="height:${Math.round(v / Math.max(n, 1) * 100)}%"></div>` : ''}</div>
+          <span>${Number(p.slice(8))}.</span></div>`;
+      }).join('')}</div>
+      <div class="vihje" style="margin:6px 0 0">Ilmaisen tason päivärajat riippuvat mallista. Punainen = epäonnistuneet kutsut (esim. kiintiö täynnä).</div>
+    </div>
+    <h2>Viimeisimmät virheet</h2>
+    <div class="kortti">${virheet.length ? virheet.map((v) => `<div class="virherivi"><small>${aikaTeksti(v.aika)} · ${esc(v.skripti)}</small>${esc(v.viesti)}</div>`).join('') : '<div class="vihje" style="margin:0">Ei virheitä. 👍</div>'}</div>`;
+}
+$('[data-nakyma="yllapito"]').addEventListener('click', (e) => { if (e.target.closest('[data-takaisin]')) history.back(); });
 
 // Suhteelliset ajat ("5 min sitten") pysyvät ajan tasalla
 setInterval(() => { if (!document.hidden && kayttaja) piirra(); }, 60000);

@@ -24,6 +24,38 @@
     "kuvaus": false
   },
   {
+    "id": "google-pelsu",
+    "nimi": "Google Uutiset",
+    "tyyppi": "uutinen",
+    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=Pelsu+OR+Pelsut+OR+%22Lahen+Pelicans%22+OR+%22Lahen+Pelsut%22+OR+%22Lahen+Pelsu%22",
+    "google": true,
+    "kuvaus": false
+  },
+  {
+    "id": "google-liigafi",
+    "nimi": "Liiga.fi",
+    "tyyppi": "uutinen",
+    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=Pelicans+site:liiga.fi",
+    "google": true,
+    "kuvaus": false
+  },
+  {
+    "id": "google-uusilahti",
+    "nimi": "Uusi Lahti",
+    "tyyppi": "uutinen",
+    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=Pelicans+site:uusilahti.fi",
+    "google": true,
+    "kuvaus": false
+  },
+  {
+    "id": "google-ess",
+    "nimi": "Etelä-Suomen Sanomat",
+    "tyyppi": "uutinen",
+    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=Pelicans+site:ess.fi",
+    "google": true,
+    "kuvaus": false
+  },
+  {
     "id": "is",
     "nimi": "Ilta-Sanomat",
     "tyyppi": "uutinen",

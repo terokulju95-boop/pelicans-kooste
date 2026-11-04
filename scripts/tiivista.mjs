@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { kirjaaGemini, kirjaaVirheet, luePoistot, onPoistettu } from './yhteiset.mjs';
 
 // ---------- Asetukset ----------
 const VALI_TUNTEJA = 2;          // uusi tiivistelmä aikaisintaan näin monen tunnin päästä edellisestä
@@ -61,8 +62,9 @@ const [kohteetDoc, ketjutDoc, vanhaDoc] = await Promise.all([
 ]);
 const nyt = Date.now();
 const raja = nyt - AINEISTO_TUNTEJA * 3600e3;
-const uutiset = (kohteetDoc.data()?.kohteet || []).filter((k) => k.aika >= raja).slice(0, MAX_UUTISIA);
-const ketjut = (ketjutDoc.data()?.ketjut || []).filter((k) => k.muuttunut >= raja).slice(0, MAX_KETJUJA);
+const poistot = await luePoistot(db);
+const uutiset = (kohteetDoc.data()?.kohteet || []).filter((k) => k.aika >= raja && !onPoistettu(poistot, k)).slice(0, MAX_UUTISIA);
+const ketjut = (ketjutDoc.data()?.ketjut || []).filter((k) => k.muuttunut >= raja && !poistot.ids.has(k.id)).slice(0, MAX_KETJUJA);
 const vanha = vanhaDoc.data();
 
 const tunnisteet = [...uutiset.map((u) => u.id), ...ketjut.map((k) => `${k.id}:${k.tila}`)];
@@ -144,8 +146,8 @@ async function kysyGemini(malli) {
 
 let tulos = null, kaytetty = null;
 for (const malli of MALLIT) {
-  try { tulos = await kysyGemini(malli); kaytetty = malli; break; }
-  catch (e) { console.warn(`⚠ ${malli}: ${e.message}`); }
+  try { tulos = await kysyGemini(malli); kaytetty = malli; await kirjaaGemini(db, true); break; }
+  catch (e) { console.warn(`⚠ ${malli}: ${e.message}`); await kirjaaGemini(db, false); await kirjaaVirheet(db, 'päivän tiivistelmä', [`${malli}: ${e.message}`]); }
 }
 if (!tulos) {
   // Edellinen tiivistelmä jää näkyviin; ajo ei kaadu, jotta keräys jatkuu normaalisti
