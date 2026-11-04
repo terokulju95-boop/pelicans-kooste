@@ -1,0 +1,10 @@
+{
+  "suomi24": {
+    "osastot": [
+      "https://keskustelu.suomi24.fi/urheilu-ja-kuntoilu/jaakiekko"
+    ],
+    "yleisetKetjut": "siirto|huhu|spekul|liiga|pelaajamarkkin|sopimu",
+    "maxKetjuja": 8,
+    "sailytysPaivia": 14
+  }
+}

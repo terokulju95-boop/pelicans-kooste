@@ -222,9 +222,97 @@ async function paivitaOttelut() {
   }
 }
 
+// ---------- Keskustelut (Suomi24) ----------
+// Tallennetaan vain ketjun otsikko, linkki ja aktiivisuustieto. Nimimerkkejä tai viestejä ei tallenneta.
+const KESKUSTELUT = lue('../keskustelut.json');
+const odota = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function puhdas(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ').trim();
+}
+
+async function haeSuomi24Lista(url) {
+  const html = await hae(url);
+  const ketjut = new Map();
+  const re = /<a[^>]+href="((?:https:\/\/keskustelu\.suomi24\.fi)?\/t\/(\d+)\/[^"#?]*)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+  for (const m of html.matchAll(re)) {
+    const id = m[2];
+    const otsikko = puhdas(m[3]);
+    if (otsikko.length < 4) continue;
+    const linkki = new URL(m[1], 'https://keskustelu.suomi24.fi').href;
+    const vanha = ketjut.get(id);
+    // Sama ketju voi olla listalla useamman linkin takana; pidetään pisin teksti (yleensä otsikko)
+    if (!vanha || otsikko.length > vanha.otsikko.length) ketjut.set(id, { id, otsikko: otsikko.slice(0, 160), linkki });
+  }
+  return [...ketjut.values()];
+}
+
+async function tutkiKetju(linkki) {
+  const teksti = puhdas(await hae(linkki));
+  const maininnat = (teksti.match(/pelicans/gi) || []).length;
+  // Muutoksen tunniste: sivun teksti ilman numeroita (suhteelliset ajat yms. eivät aiheuta turhia muutoksia)
+  const tila = hajautus(teksti.replace(/\d+/g, ''));
+  return { maininnat, tila };
+}
+
+async function paivitaKeskustelut() {
+  const asetus = KESKUSTELUT.suomi24;
+  const yleiset = new RegExp(asetus.yleisetKetjut, 'i');
+  const ref = db.doc('kooste/keskustelut');
+  const vanha = (await ref.get()).data();
+  const ketjut = new Map((vanha?.ketjut || []).map((k) => [k.id, k]));
+  const nyt = Date.now();
+
+  let ehdokkaat = [];
+  for (const osasto of asetus.osastot) {
+    try {
+      const lista = await haeSuomi24Lista(osasto);
+      console.log(`Suomi24 ${osasto}: ${lista.length} ketjua listalla`);
+      console.log('  esim:', lista.slice(0, 5).map((k) => k.otsikko).join(' | '));
+      ehdokkaat.push(...lista);
+    } catch (e) { console.warn(`⚠ Suomi24 ${osasto}: ${e.message}`); }
+  }
+
+  const omat = ehdokkaat.filter((k) => onPelicans(k.otsikko));
+  const muut = ehdokkaat.filter((k) => !onPelicans(k.otsikko) && yleiset.test(k.otsikko));
+  const tutkittavat = [...omat, ...muut].slice(0, asetus.maxKetjuja);
+  console.log(`Pelicans-ketjuja ${omat.length}, yleisiä huhuketjuja ${muut.length}, tutkitaan ${tutkittavat.length}`);
+
+  for (const k of tutkittavat) {
+    try {
+      await odota(1000);
+      const { maininnat, tila } = await tutkiKetju(k.linkki);
+      const oma = onPelicans(k.otsikko);
+      if (!oma && maininnat === 0) continue; // yleinen ketju, jossa ei puhuta Pelicansista
+      const id = 's24-' + k.id;
+      const ed = ketjut.get(id);
+      if (!ed) {
+        ketjut.set(id, { id, tyyppi: 'keskustelu', lahde: 'Suomi24', otsikko: k.otsikko, linkki: k.linkki,
+          pelicansKetju: oma, maininnat, tila, lisatty: nyt, muuttunut: nyt });
+      } else if (ed.tila !== tila) {
+        Object.assign(ed, { otsikko: k.otsikko, maininnat, tila, muuttunut: nyt });
+      }
+    } catch (e) { console.warn(`⚠ ketju ${k.linkki}: ${e.message}`); }
+  }
+
+  const raja = nyt - asetus.sailytysPaivia * 864e5;
+  const lista = [...ketjut.values()].filter((k) => k.muuttunut >= raja).sort((a, b) => b.muuttunut - a.muuttunut);
+  if (!vanha || vakaa(lista) !== vakaa(vanha.ketjut || [])) {
+    await ref.set({ ketjut: lista, paivitetty: nyt });
+    console.log(`Keskustelut tallennettu (${lista.length} ketjua).`);
+  } else {
+    console.log('Keskustelut ennallaan.');
+  }
+}
+
 // ---------- Ajo ----------
 let virhe = false;
-for (const [nimi, fn] of [['uutiset', paivitaUutiset], ['ottelut', paivitaOttelut]]) {
+for (const [nimi, fn] of [['uutiset', paivitaUutiset], ['ottelut', paivitaOttelut], ['keskustelut', paivitaKeskustelut]]) {
   try { await fn(); } catch (e) { virhe = true; console.error(`✗ ${nimi}:`, e); }
 }
 process.exit(virhe ? 1 : 0);

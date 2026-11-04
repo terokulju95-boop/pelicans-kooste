@@ -1,7 +1,9 @@
 // Pelicans-kooste – service worker
-// MUUTA VERSIO aina kun päivität index.html:ää tai muita sovellustiedostoja.
-// Silloin sovellus kysyy "Päivitetäänkö?" ja ottaa uuden version käyttöön.
-const VERSIO = '1';
+// Päivittyy automaattisesti: sovellustiedostot haetaan aina ensin verkosta,
+// ja välimuistia käytetään vain, jos verkkoa ei ole. Uusi versio näkyy siis
+// heti kun sovelluksen avaa, eikä sovellusta tarvitse asentaa uudelleen.
+// VERSIO-numeroa ei tarvitse enää muuttaa joka kerta (sen muuttaminen tyhjentää välimuistin).
+const VERSIO = '2';
 const CACHE = 'pelicans-kooste-v' + VERSIO;
 const TIEDOSTOT = [
   './',
@@ -13,7 +15,8 @@ const TIEDOSTOT = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(TIEDOSTOT)));
+  self.skipWaiting(); // uusi versio käyttöön heti, ei odotusta
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(TIEDOSTOT)).catch(() => {}));
 });
 
 self.addEventListener('activate', (e) => {
@@ -24,6 +27,7 @@ self.addEventListener('activate', (e) => {
   })());
 });
 
+// Vanhan version "Päivitä"-napin tuki
 self.addEventListener('message', (e) => {
   if (e.data === 'PAIVITA') self.skipWaiting();
 });
@@ -33,7 +37,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Firebase SDK -tiedostot (gstatic): välimuistista, jotta sovellus aukeaa nopeasti
+  // Firebase SDK (versioitu osoite, ei muutu): välimuistista
   if (url.origin === 'https://www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) {
     e.respondWith(caches.open(CACHE).then(async (c) => {
       const osuma = await c.match(req);
@@ -45,9 +49,20 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Omat tiedostot: välimuistista, muuten verkosta
+  // Omat tiedostot: ensin verkosta (aina uusin versio), verkon puuttuessa välimuistista
   if (url.origin === self.location.origin) {
-    e.respondWith(caches.match(req, { ignoreSearch: true }).then((osuma) => osuma || fetch(req)));
+    e.respondWith((async () => {
+      const c = await caches.open(CACHE);
+      try {
+        const vastaus = await fetch(req, { cache: 'no-cache' });
+        if (vastaus.ok) c.put(req, vastaus.clone());
+        return vastaus;
+      } catch {
+        return (await c.match(req, { ignoreSearch: true })) ||
+               (req.mode === 'navigate' ? await c.match('index.html') : undefined) ||
+               Response.error();
+      }
+    })());
   }
   // Kaikki muu (Firestore, kirjautuminen) menee suoraan verkkoon
 });
