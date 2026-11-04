@@ -1,0 +1,23 @@
+name: Tutki lähteet
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tutki:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/tutki.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: naytteet
+          path: naytteet/
+          retention-days: 7
