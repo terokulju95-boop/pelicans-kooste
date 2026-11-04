@@ -89,6 +89,7 @@ const LUOKAT = ['otteluraportti', 'siirto', 'loukkaantuminen', 'talous', 'junior
 const SKEEMA = {
   type: 'OBJECT',
   properties: {
+    pelicans: { type: 'BOOLEAN' },
     asiaotsikko: { type: 'STRING' },
     lyhyt: { type: 'STRING' },
     tiivistelma: { type: 'STRING' },
@@ -112,10 +113,12 @@ const SKEEMA = {
       },
     },
   },
-  required: ['asiaotsikko', 'lyhyt', 'tiivistelma', 'pointit', 'vajaa', 'luokka', 'pelaajat', 'tarkeys', 'siirrot'],
+  required: ['pelicans', 'asiaotsikko', 'lyhyt', 'tiivistelma', 'pointit', 'vajaa', 'luokka', 'pelaajat', 'tarkeys', 'siirrot'],
 };
 
+const RELEVANSSI = `- "pelicans": true vain, jos juttu oikeasti käsittelee Lahden Pelicans -jääkiekkojoukkuetta, sen pelaajia, valmentajia, otteluita, seuraa tai junioreita. false, jos Pelicans mainitaan vain ohimennen (esim. pitkä lista muiden joukkueiden tuloksia), sivun reunassa tai jos aihe on aivan muu (politiikka, ravit, talous yleisesti, NBA:n New Orleans Pelicans).`;
 const OHJE_UUTINEN = `Tiivistät suomeksi jääkiekkouutisen Lahden Pelicans -faneille.
+${RELEVANSSI}
 - "asiaotsikko": selkeä asiaotsikko (alle 12 sanaa), joka kertoo suoraan mitä tapahtui – ei klikkiotsikkoa, ei kysymyksiä.
 - "lyhyt": 1–2 virkettä, jutun ydin.
 - "tiivistelma": 3–5 virkettä omin sanoin: mitä tapahtui ja miksi sillä on väliä Pelicansille.
@@ -128,12 +131,14 @@ const OHJE_UUTINEN = `Tiivistät suomeksi jääkiekkouutisen Lahden Pelicans -fa
 - Käytä vain annettua tekstiä. Älä keksi mitään. Älä lainaa pitkiä pätkiä sanatarkasti.`;
 
 const OHJE_OTSIKKO = `Luokittelet suomeksi jääkiekkouutisen Lahden Pelicans -faneille pelkän otsikon (ja mahdollisen lyhyen kuvauksen) perusteella.
+${RELEVANSSI}
 Täytä kentät samoin säännöin kuin koko jutulle, mutta: "lyhyt" ja "tiivistelma" = tyhjä merkkijono, "pointit" = tyhjä lista, "vajaa" = true.
 "siirrot": vain jos otsikko kertoo selvästi Pelicansin siirrosta tai sopimuksesta (suunta tulossa/lahdossa/jatkaa, varmuus vahvistettu/huhu).
 "asiaotsikko": selkeä asiaotsikko otsikon perusteella. "luokka", "pelaajat" ja "tarkeys" otsikon perusteella. Älä keksi mitään, mitä otsikossa ei ole.
 Luokat: otteluraportti, siirto, loukkaantuminen, talous, juniorit, kolumni, muu. Tärkeys 1–5 (5 = iso uutinen Pelicansille).`;
 
 const OHJE_KETJU = `Tiivistät suomeksi keskustelupalstan ketjun Lahden Pelicans -faneille.
+- "pelicans": true, jos ketjussa puhutaan Lahden Pelicansista edes osittain.
 - "asiaotsikko": selkeä kuvaus ketjun tämänhetkisestä puheenaiheesta (alle 12 sanaa).
 - "lyhyt": 1–2 virkettä: mistä nyt puhutaan.
 - "tiivistelma": 3–5 virkettä: mistä ketjussa puhutaan ja millainen tunnelma on. Painota Pelicansia koskevaa ja tuoreinta keskustelua.
@@ -170,6 +175,7 @@ async function gemini(ohje, sisalto) {
         vajaa: !!j.vajaa,
         malli,
         // kohteen omat tiedot
+        pelicans: j.pelicans !== false,
         asiaotsikko: String(j.asiaotsikko || '').trim().slice(0, 140),
         luokka: LUOKAT.includes(j.luokka) ? j.luokka : 'muu',
         pelaajat: (j.pelaajat || []).map((p) => String(p).trim()).filter((p) => p.length > 3 && p.length < 50).slice(0, 6),
@@ -189,8 +195,9 @@ async function gemini(ohje, sisalto) {
 
 // Erottelee Geminin vastauksesta kohteen tiedot (luokka, pelaajat…) ja tiivistelmän
 function tallennaTulos(k, t, lisa = {}) {
-  const { asiaotsikko, luokka, pelaajat, tarkeys, siirrot, ...tiiv } = t;
+  const { asiaotsikko, luokka, pelaajat, tarkeys, siirrot, pelicans, ...tiiv } = t;
   Object.assign(k, { luokka, pelaajat, tarkeys });
+  if (pelicans === false && !k.varmistettu) k.eiRelevantti = true; else delete k.eiRelevantti;
   if (siirrot?.length) k.siirrot = siirrot;
   if (asiaotsikko) k.asiaotsikko = asiaotsikko;
   if (!lisa.vainLuokitus) k.tiiv = { ...tiiv, tehty: Date.now(), ...lisa };
@@ -202,6 +209,7 @@ async function luokitteleOtsikosta(k) {
   const t = await gemini(OHJE_OTSIKKO, `Lähde: ${k.lahde}\nOtsikko: ${k.otsikko}${k.kuvaus ? `\nKuvaus: ${k.kuvaus}` : ''}${k.tiiv?.teksti ? `\nTiivistelmä: ${k.tiiv.teksti}` : ''}`);
   if (t) tallennaTulos(k, t, { vainLuokitus: true });
   k.luokiteltu = true;
+  k.relevanssiTarkistettu = true;
 }
 
 // Liigan uutisten tekstit rajapinnasta (sivu itse latautuu JavaScriptillä, joten sitä ei voi lukea suoraan)
@@ -225,6 +233,7 @@ async function kasitteleUutinen(k) {
     if (!t) throw new Error('Gemini ei vastannut');
     tallennaTulos(k, t);
     k.luokiteltu = true;
+    k.relevanssiTarkistettu = true;
     return;
   }
   let linkki = k.linkki;
@@ -255,6 +264,7 @@ async function kasitteleUutinen(k) {
   if (t.vajaa) k.maksumuuri = true;
   tallennaTulos(k, t);
   k.luokiteltu = true;
+  k.relevanssiTarkistettu = true;
 }
 
 // ---------- Keskustelut ----------
@@ -277,7 +287,7 @@ const jono = elossa
   .slice(0, MAX_JUTTUJA_AJOSSA);
 // Vanhat jutut, joilta puuttuu luokka/pelaajat/asiaotsikko: luokitellaan tiivistelmän perusteella
 const takautuvat = elossa
-  .filter((k) => k.tiiv && !k.luokiteltu && !jono.includes(k))
+  .filter((k) => k.tiiv && (!k.luokiteltu || !k.relevanssiTarkistettu) && !jono.includes(k))
   .sort((a, b) => b.aika - a.aika)
   .slice(0, MAX_JUTTUJA_AJOSSA);
 

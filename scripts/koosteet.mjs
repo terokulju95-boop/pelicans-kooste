@@ -78,7 +78,7 @@ async function gemini(ohje, aineisto) {
 const [kD, tD, oD, kkD, kosD, pelD] = await Promise.all(['kohteet', 'tilastot', 'ottelut', 'keskustelut', 'koosteet', 'pelaajat']
   .map((d) => db.doc(`kooste/${d}`).get()));
 const poistot = await luePoistot(db);
-const kohteet = (kD.data()?.kohteet || []).filter((k) => !onPoistettu(poistot, k));
+const kohteet = (kD.data()?.kohteet || []).filter((k) => !onPoistettu(poistot, k) && !k.eiRelevantti);
 const tilastot = tD.data() || {};
 const ottelut = oD.data() || {};
 const ketjut = (kkD.data()?.ketjut || []).filter((k) => !poistot.ids.has(k.id));

@@ -101,10 +101,12 @@ async function haePelicansFi(lahde) {
 // Liigan omat uutiset rajapinnasta (otsikko + teksti); mukaan vain Pelicansia koskevat
 async function haeLiigaUutiset(lahde) {
   const d = JSON.parse(await hae(lahde.url));
-  return (d.articles || []).filter((a) => onPelicans(`${a.articleTitle} ${a.searchText || ''}`)).map((a) => ({
+  // Pelicans otsikossa tai tekstissä vähintään kahdesti (ei pelkkiä sivumainintoja kierroskoosteissa)
+  const maininnat = (t) => (String(t || '').match(/pelicans|pelsu/gi) || []).length;
+  return (d.articles || []).filter((a) => onPelicans(a.articleTitle) || maininnat(a.searchText) >= 2).map((a) => ({
     id: 'liiga-' + a.id, tyyppi: 'uutinen', lahde: 'Liiga.fi', otsikko: a.articleTitle,
     kuvaus: lyhenna(a.searchText || ''), linkki: new URL(a.url, 'https://liiga.fi').href,
-    aika: Date.parse(a.newsDate) || Date.now(), liigaId: a.id, google: false, maksumuuri: false,
+    aika: Date.parse(a.newsDate) || Date.now(), liigaId: a.id, google: false, maksumuuri: false, varmistettu: true,
   }));
 }
 
@@ -127,9 +129,8 @@ async function keraaLahde(lahde) {
     }
     const kuvaus = lahde.kuvaus ? lyhenna(item.contentSnippet || '') : '';
     if (!otsikko || !item.link) continue;
-    // Google-haku on jo rajattu Pelicansiin; muista syötteistä vaaditaan Pelicans-maininta
-    const teksti = `${otsikko} ${kuvaus}`;
-    if (lahde.google ? !onPelicans(teksti + ' pelicans') : !onPelicans(teksti)) continue;
+    // Pelicans-maininta vaaditaan otsikossa tai syötteen kuvauksessa (paitsi seuran omilla sivuilla)
+    if (!lahde.kaikki && !onPelicans(`${otsikko} ${kuvaus}`)) continue;
     const aika = Date.parse(item.isoDate || item.pubDate || '') || Date.now();
     tulos.push({
       id: hajautus(item.link),
@@ -139,6 +140,7 @@ async function keraaLahde(lahde) {
       kuvaus,
       linkki: item.link,
       aika,
+      varmistettu: !!lahde.kaikki,
       google: !!lahde.google,
       maksumuuri: !!lahde.maksumuuri,
     });
@@ -192,8 +194,10 @@ async function paivitaUutiset() {
 
   const raja = nyt - SAILYTYS_PV * 864e5;
   const ennen = kohteet.length;
+  // Jo tallennetuista poistetaan jutut, joissa Pelicansia ei mainita (vanhat väljemmän suodatuksen jäänteet)
+  const relevantti = (k) => k.varmistettu || k.lahde === 'Pelicans.fi' || onPelicans(`${k.otsikko} ${k.kuvaus || ''}`);
   const siivottu = kohteet
-    .filter((k) => k.aika >= raja && !onPoistettu(poistot, k))
+    .filter((k) => k.aika >= raja && !onPoistettu(poistot, k) && relevantti(k))
     .sort((a, b) => b.aika - a.aika)
     .slice(0, MAX_KOHTEITA);
   const poistettu = ennen - siivottu.length;

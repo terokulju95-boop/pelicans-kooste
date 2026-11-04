@@ -63,7 +63,7 @@ const [kohteetDoc, ketjutDoc, vanhaDoc] = await Promise.all([
 const nyt = Date.now();
 const raja = nyt - AINEISTO_TUNTEJA * 3600e3;
 const poistot = await luePoistot(db);
-const uutiset = (kohteetDoc.data()?.kohteet || []).filter((k) => k.aika >= raja && !onPoistettu(poistot, k)).slice(0, MAX_UUTISIA);
+const uutiset = (kohteetDoc.data()?.kohteet || []).filter((k) => k.aika >= raja && !onPoistettu(poistot, k) && !k.eiRelevantti).slice(0, MAX_UUTISIA);
 const ketjut = (ketjutDoc.data()?.ketjut || []).filter((k) => k.muuttunut >= raja && !poistot.ids.has(k.id)).slice(0, MAX_KETJUJA);
 const vanha = vanhaDoc.data();
 

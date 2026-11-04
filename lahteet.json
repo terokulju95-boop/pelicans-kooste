@@ -89,6 +89,7 @@
     "tyyppi": "uutinen",
     "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=site:pelicans.fi",
     "google": true,
-    "kuvaus": false
+    "kuvaus": false,
+    "kaikki": true
   }
 ]
