@@ -28,4 +28,9 @@ jobs:
       - run: node scripts/keraa.mjs
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      - uses: gautamkrishnar/keepalive-workflow@v2
+      # Pitää ajastuksen päällä (GitHub pysäyttää sen muuten 60 päivän hiljaiselon jälkeen)
+      - name: Pidä ajastus päällä
+        if: always()
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/keraa.yml/enable" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
