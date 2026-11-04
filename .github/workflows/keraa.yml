@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       pakota:
-        description: 'Tee tekoälytiivistelmä heti (ohita 2 tunnin odotus)'
+        description: 'Tee tekoälytiivistelmät ja koosteet heti (ohita odotusajat)'
         type: boolean
         default: false
 
@@ -22,7 +22,7 @@ permissions:
 jobs:
   keraa:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,6 +42,13 @@ jobs:
       - name: Tekoälytiivistelmä
         if: always()
         run: node scripts/tiivista.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PAKOTA: ${{ inputs.pakota }}
+      - name: Koosteet (viikko, ennakko, jälkikooste, kolumnit, pelaajat)
+        if: always()
+        run: node scripts/koosteet.mjs
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
