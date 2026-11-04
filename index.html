@@ -57,6 +57,15 @@
     background: var(--oranssi); margin-right: 8px; vertical-align: 3px; }
   .lukko { font-size: 12px; }
   .korostus { border-left: 4px solid var(--turkoosi); }
+  .tiivis { font-size: 16.5px; line-height: 1.55; }
+  .viite { display: inline-flex; align-items: center; justify-content: center; min-width: 19px; height: 19px;
+    padding: 0 5px; margin-left: 3px; border-radius: 6px; background: rgba(51,193,212,.16); color: var(--turkoosi);
+    font-size: 11.5px; font-weight: 700; vertical-align: 2px; }
+  .huhukortti { border-left: 4px solid var(--oranssi); }
+  .huhukortti .viite { background: rgba(245,154,27,.16); color: var(--oranssi); }
+  .huhurivi { border-left: 4px solid rgba(245,154,27,.6); padding: 11px 14px; }
+  .vihje { color: var(--harmaa); font-size: 14px; margin: -2px 4px 4px; }
+  .vihje b { color: var(--oranssi); }
   .tyhja { color: var(--harmaa); text-align: center; padding: 34px 16px; }
   .tyhja b { color: var(--teksti); display: block; margin-bottom: 6px; font-size: 17px; }
 
@@ -216,6 +225,7 @@ let piilotettu = 0;
 let kohteet = [];
 let ottelut = null;
 let ketjut = [];
+let tiivistelma = null;
 let paivitysAika = null;
 let kuuntelijat = [];
 
@@ -303,6 +313,10 @@ async function kaynnista() {
     ketjut = s.data()?.ketjut || [];
     piirra();
   }, virheKuuntelussa));
+  kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'tiivistelma'), (s) => {
+    tiivistelma = s.data() || null;
+    piirra();
+  }, virheKuuntelussa));
   piirra();
 }
 
@@ -377,6 +391,35 @@ function ketjuKortti(k) {
   </a>`;
 }
 
+// Tiivistelmän lähdeviitteet [3] tai [2, 5] → pienet linkit
+function viitteet(teksti) {
+  const l = tiivistelma?.lahteet || {};
+  return esc(teksti).replace(/\s*\[(\d+(?:\s*,\s*\d+)*)\]/g, (m, nrot) => {
+    const linkit = nrot.split(/\s*,\s*/).filter((x) => l[x])
+      .map((x) => `<a class="viite" href="${esc(l[x].linkki)}" target="_blank" rel="noopener" title="${esc(l[x].lahde + ': ' + l[x].otsikko)}">${x}</a>`);
+    return linkit.length ? ' ' + linkit.join('') : '';
+  });
+}
+
+function tiivistelmaKortti(teksti, huhu = false) {
+  if (!tiivistelma) return `<div class="kortti korostus"><div class="kuvaus" style="margin:0">Tiivistelmää ei ole vielä tehty. Se valmistuu seuraavan keräyksen yhteydessä.</div></div>`;
+  return `<div class="kortti ${huhu ? 'huhukortti' : 'korostus'}">
+    <div class="tiivis">${viitteet(teksti || '')}</div>
+    <div class="meta"><span>Tekoälyn tiivistelmä klo ${kello(tiivistelma.tehty)}</span><span>·</span><span>tarkista lähteistä</span></div>
+  </div>`;
+}
+
+function huhuLinkit() {
+  const l = tiivistelma?.lahteet || {};
+  return (tiivistelma?.kuumimmatHuhut || []).map((h) => {
+    const eka = l[h.lahteet?.[0]];
+    const sisalto = `<div class="otsikko" style="font-size:16px">${esc(h.teksti)}</div>
+      ${eka ? `<div class="meta"><span>${esc(eka.lahde)}</span></div>` : ''}`;
+    return eka ? `<a class="kortti huhurivi" href="${esc(eka.linkki)}" target="_blank" rel="noopener">${sisalto}</a>`
+               : `<div class="kortti huhurivi">${sisalto}</div>`;
+  }).join('');
+}
+
 const tyhja = (otsikko, teksti) => `<div class="tyhja"><b>${otsikko}</b>${teksti}</div>`;
 
 function piirra() {
@@ -398,9 +441,10 @@ function piirra() {
   const seuraava = ottelut?.tulevat?.[0];
   $('[data-nakyma="kooste"]').innerHTML = `
     <h2>Päivän Pelicans</h2>
-    <div class="kortti korostus"><div class="kuvaus" style="margin:0">Tekoälyn tiivistelmä tulee tähän myöhemmin (vaihe 4).
-      ${uusia ? `Edellisen käyntisi jälkeen on tullut <b style="color:var(--oranssi)">${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.` : ''}</div></div>
+    ${tiivistelmaKortti(tiivistelma?.uutiset)}
+    ${uusia ? `<div class="vihje">Edellisen käyntisi jälkeen on tullut <b>${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.</div>` : ''}
     ${seuraava ? `<h2>Seuraava ottelu</h2>${otteluKortti(seuraava, true)}` : ''}
+    ${tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : ''}
     <h2>Tuoreimmat uutiset</h2>
     ${uutiset.slice(0, 3).map(uutisKortti).join('') || tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.')}
     ${ketjutJarj.length ? `<h2>Kuumimmat keskustelut</h2>${ketjutJarj.slice(0, 3).map(ketjuKortti).join('')}` : ''}
@@ -412,7 +456,12 @@ function piirra() {
     : tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.');
 
   // Huhut ja keskustelut (vaiheet 3–4)
-  $('[data-nakyma="huhut"]').innerHTML = tyhja('Huhumylly tulossa', 'Huhujen tiivistelmä tulee tähän vaiheessa 4.');
+  $('[data-nakyma="huhut"]').innerHTML = `
+    <h2>Huhumylly</h2>
+    ${tiivistelmaKortti(tiivistelma?.huhut, true)}
+    ${tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : ''}
+    ${ketjutJarj.length ? `<h2>Huhuja käsittelevät keskustelut</h2>${ketjutJarj.map(ketjuKortti).join('')}` : ''}
+  `;
   $('[data-nakyma="keskustelut"]').innerHTML = ketjutJarj.length
     ? `<h2>Keskustelut · ${ketjutJarj.length}</h2>` + ketjutJarj.map(ketjuKortti).join('')
     : tyhja('Ei aktiivisia keskusteluja', 'Pelicans-ketjut ilmestyvät tähän, kun palstoilla puhutaan Pelicansista.');
