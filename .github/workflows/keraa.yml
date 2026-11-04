@@ -22,7 +22,7 @@ permissions:
 jobs:
   keraa:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,6 +33,12 @@ jobs:
       - run: node scripts/keraa.mjs
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Juttujen ja ketjujen tiivistelmät
+        if: always()
+        run: node scripts/jutut.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       - name: Tekoälytiivistelmä
         if: always()
         run: node scripts/tiivista.mjs
