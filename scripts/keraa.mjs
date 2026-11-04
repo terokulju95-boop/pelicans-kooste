@@ -9,6 +9,8 @@ import Parser from 'rss-parser';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { kirjaaLahteet, kirjaaVirheet, luePoistot, onPoistettu } from './yhteiset.mjs';
+import { paivitaOttelut as tilastot } from './tilastot.mjs';
+const paivitaOttelut = () => tilastot(db, hae, vakaa);
 
 const TILA = [];     // lähteiden tila ylläpitonäkymään
 const VIRHEET = [];
@@ -96,8 +98,19 @@ async function haePelicansFi(lahde) {
 }
 
 // ---------- Uutisten keräys ----------
+// Liigan omat uutiset rajapinnasta (otsikko + teksti); mukaan vain Pelicansia koskevat
+async function haeLiigaUutiset(lahde) {
+  const d = JSON.parse(await hae(lahde.url));
+  return (d.articles || []).filter((a) => onPelicans(`${a.articleTitle} ${a.searchText || ''}`)).map((a) => ({
+    id: 'liiga-' + a.id, tyyppi: 'uutinen', lahde: 'Liiga.fi', otsikko: a.articleTitle,
+    kuvaus: lyhenna(a.searchText || ''), linkki: new URL(a.url, 'https://liiga.fi').href,
+    aika: Date.parse(a.newsDate) || Date.now(), liigaId: a.id, google: false, maksumuuri: false,
+  }));
+}
+
 async function keraaLahde(lahde) {
   if (lahde.tapa === 'pelicansfi') return haePelicansFi(lahde);
+  if (lahde.tapa === 'liiga') return haeLiigaUutiset(lahde);
   const xml = await hae(lahde.url);
   const syote = await parser.parseString(xml);
   const tulos = [];
@@ -195,69 +208,6 @@ async function paivitaUutiset() {
   }
 }
 
-// ---------- Liigan ottelut ja sarjataulukko ----------
-function kausi() {
-  const d = new Date();
-  return d.getMonth() >= 6 ? d.getFullYear() + 1 : d.getFullYear(); // kausi 2026–27 = 2027
-}
-
-const onPeli = (j) => /pelicans/i.test(`${j?.teamName || ''} ${j?.teamId || ''}`);
-const nimi = (j) => j?.teamName || j?.teamId || '?';
-
-async function paivitaOttelut() {
-  const k = kausi();
-  const peleja = JSON.parse(await hae(`https://liiga.fi/api/v2/games?tournament=runkosarja&season=${k}`));
-  const lista = Array.isArray(peleja) ? peleja : (peleja.games || []);
-  if (lista[0]) console.log('Ottelun kentät:', Object.keys(lista[0]).join(', '));
-
-  const omat = lista
-    .filter((g) => onPeli(g.homeTeam) || onPeli(g.awayTeam))
-    .map((g) => ({
-      id: g.id,
-      aika: Date.parse(g.start) || null,
-      koti: nimi(g.homeTeam),
-      vieras: nimi(g.awayTeam),
-      kotiMaalit: g.homeTeam?.goals ?? null,
-      vierasMaalit: g.awayTeam?.goals ?? null,
-      kotona: onPeli(g.homeTeam),
-      paattynyt: !!g.ended,
-      kaynnissa: !!g.started && !g.ended,
-      ratkaisu: g.finishedType || null,
-    }))
-    .sort((a, b) => a.aika - b.aika);
-  console.log(`Pelicansin otteluita kaudella ${k}: ${omat.length}`);
-
-  const tulevat = omat.filter((o) => !o.paattynyt).slice(0, 5);
-  const pelatut = omat.filter((o) => o.paattynyt).slice(-5).reverse();
-
-  let sarjataulukko = [];
-  try {
-    const st = JSON.parse(await hae(`https://liiga.fi/api/v2/standings/?season=${k}`));
-    const rivit = Array.isArray(st) ? st : (st.season || st.standings || Object.values(st).find(Array.isArray) || []);
-    if (rivit[0]) console.log('Sarjataulukon kentät:', Object.keys(rivit[0]).join(', '));
-    sarjataulukko = rivit.map((r, i) => ({
-      sija: r.ranking ?? r.position ?? i + 1,
-      joukkue: r.teamName ?? r.name ?? r.team?.teamName ?? r.internalId ?? '?',
-      ottelut: r.games ?? r.gamesPlayed ?? null,
-      pisteet: r.points ?? null,
-      maalit: r.goals != null && r.goalsAgainst != null ? `${r.goals}–${r.goalsAgainst}` : null,
-    })).filter((r) => r.joukkue !== '?');
-  } catch (e) {
-    console.warn('⚠ sarjataulukko:', e.message);
-  }
-
-  const data = { kausi: k, tulevat, pelatut, sarjataulukko };
-  const ref = db.doc('kooste/ottelut');
-  const vanha = (await ref.get()).data();
-  const { paivitetty, ...vanhaData } = vanha || {};
-  if (vakaa(vanhaData) !== vakaa(data)) {
-    await ref.set({ ...data, paivitetty: Date.now() });
-    console.log('Ottelut tallennettu.');
-  } else {
-    console.log('Ottelut ennallaan.');
-  }
-}
-
 // ---------- Keskustelut (Suomi24) ----------
 // Tallennetaan vain ketjun otsikko, linkki ja aktiivisuustieto. Nimimerkkejä tai viestejä ei tallenneta.
 const KESKUSTELUT = lue('../keskustelut.json');
@@ -275,15 +225,23 @@ function puhdas(html) {
 async function haeSuomi24Lista(url) {
   const html = await hae(url);
   const ketjut = new Map();
+  // Ketjukortit: <article class="thread-card" data-thread-id="…"> … <span aria-label="386 vastausta">
+  for (const m of html.matchAll(/<article[^>]*class="thread-card"[^>]*data-thread-id="(\d+)"[\s\S]*?<\/article>/gi)) {
+    const kortti = m[0];
+    const a = kortti.match(/<h2[^>]*thread-card__title[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+    if (!a) continue;
+    const vastaukset = Number(kortti.match(/aria-label="(\d+)\s+vastaus/i)?.[1] ?? NaN);
+    ketjut.set(m[1], { id: m[1], otsikko: puhdas(a[2]).slice(0, 160),
+      linkki: new URL(a[1], 'https://keskustelu.suomi24.fi').href.split('#')[0], vastaukset: Number.isFinite(vastaukset) ? vastaukset : null });
+  }
+  if (ketjut.size) return [...ketjut.values()];
+  // Varatapa, jos sivun rakenne muuttuu: pelkät ketjulinkit
   const re = /<a[^>]+href="((?:https:\/\/keskustelu\.suomi24\.fi)?\/t\/(\d+)\/[^"#?]*)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
   for (const m of html.matchAll(re)) {
-    const id = m[2];
     const otsikko = puhdas(m[3]);
     if (otsikko.length < 4) continue;
-    const linkki = new URL(m[1], 'https://keskustelu.suomi24.fi').href;
-    const vanha = ketjut.get(id);
-    // Sama ketju voi olla listalla useamman linkin takana; pidetään pisin teksti (yleensä otsikko)
-    if (!vanha || otsikko.length > vanha.otsikko.length) ketjut.set(id, { id, otsikko: otsikko.slice(0, 160), linkki });
+    const vanha = ketjut.get(m[2]);
+    if (!vanha || otsikko.length > vanha.otsikko.length) ketjut.set(m[2], { id: m[2], otsikko: otsikko.slice(0, 160), linkki: new URL(m[1], 'https://keskustelu.suomi24.fi').href, vastaukset: null });
   }
   return [...ketjut.values()];
 }
@@ -338,9 +296,11 @@ async function paivitaKeskustelut() {
       const ed = ketjut.get(id);
       if (!ed) {
         ketjut.set(id, { id, tyyppi: 'keskustelu', lahde: 'Suomi24', otsikko: k.otsikko, linkki: k.linkki,
-          pelicansKetju: oma, maininnat, tila, lisatty: nyt, muuttunut: nyt });
-      } else if (ed.tila !== tila) {
-        Object.assign(ed, { otsikko: k.otsikko, maininnat, tila, muuttunut: nyt });
+          pelicansKetju: oma, maininnat, tila, lisatty: nyt, muuttunut: nyt, vastaukset: k.vastaukset, uusiaViesteja: 0 });
+      } else if (ed.tila !== tila || (k.vastaukset != null && k.vastaukset !== ed.vastaukset)) {
+        const uusia = k.vastaukset != null && ed.vastaukset != null ? Math.max(0, k.vastaukset - ed.vastaukset) : 0;
+        Object.assign(ed, { otsikko: k.otsikko, maininnat, tila, muuttunut: nyt, vastaukset: k.vastaukset ?? ed.vastaukset,
+          uusiaViesteja: uusia, edellisetVastaukset: ed.vastaukset ?? null });
       }
     } catch (e) { console.warn(`⚠ ketju ${k.linkki}: ${e.message}`); }
   }

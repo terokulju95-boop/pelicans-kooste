@@ -3,7 +3,7 @@
 // ja välimuistia käytetään vain, jos verkkoa ei ole. Uusi versio näkyy siis
 // heti kun sovelluksen avaa, eikä sovellusta tarvitse asentaa uudelleen.
 // VERSIO-numeroa ei tarvitse enää muuttaa joka kerta (sen muuttaminen tyhjentää välimuistin).
-const VERSIO = '2';
+const VERSIO = '3';
 const CACHE = 'pelicans-kooste-v' + VERSIO;
 const TIEDOSTOT = [
   './',
@@ -65,4 +65,30 @@ self.addEventListener('fetch', (e) => {
     })());
   }
   // Kaikki muu (Firestore, kirjautuminen) menee suoraan verkkoon
+});
+
+// ---------- Push-ilmoitukset (Firebase Cloud Messaging, data-viestit) ----------
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { const j = e.data?.json() || {}; d = j.data || j; } catch { d = { teksti: e.data?.text() }; }
+  const otsikko = d.otsikko || d.title || 'Pelicans-kooste';
+  e.waitUntil(self.registration.showNotification(otsikko, {
+    body: d.teksti || d.body || '',
+    icon: 'kuvakkeet/icon-192.png',
+    badge: 'kuvakkeet/icon-192.png',
+    tag: d.tag || undefined,
+    data: { url: d.url || './' },
+  }));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = new URL(e.notification.data?.url || './', self.registration.scope).href;
+  e.waitUntil((async () => {
+    const ikkunat = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of ikkunat) {
+      if (w.url.startsWith(self.registration.scope)) { await w.focus(); w.postMessage({ avaa: url }); return; }
+    }
+    await self.clients.openWindow(url);
+  })());
 });

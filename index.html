@@ -112,6 +112,57 @@
   .s-ps { background: var(--oranssi); } .s-pu { background: var(--tappio); }
 
   .tiivis { font-size: 16.5px; line-height: 1.55; }
+
+  /* Ottelut ja tilastot */
+  .iso-tulos { color: var(--turkoosi); margin-left: 6px; }
+  .tapahtumat { display: flex; flex-direction: column; }
+  .era { color: var(--harmaa); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 10px 0 4px; }
+  .tapahtuma { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--raja); font-size: 15px; }
+  .tapahtuma .t-aika { color: var(--harmaa); font-variant-numeric: tabular-nums; width: 42px; flex: none; font-size: 13px; }
+  .tapahtuma .t-tilanne { font-weight: 700; width: 38px; flex: none; font-variant-numeric: tabular-nums; }
+  .tapahtuma .t-teksti small { display: block; color: var(--harmaa); font-size: 12.5px; }
+  .tapahtuma em { color: var(--oranssi); font-style: normal; font-size: 12px; }
+  .tapahtuma.maali.oma .t-tilanne { color: var(--turkoosi); }
+  .tapahtuma.jaahy { opacity: .75; }
+  .mvrivi { padding: 6px 0; } .mvrivi span { color: var(--harmaa); font-size: 14px; display: block; }
+  .kokoonpano .ketju { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--raja); font-size: 14.5px; }
+  .kokoonpano .ketju b { color: var(--turkoosi); width: 28px; flex: none; }
+  .kokoonpano small { display: block; color: var(--harmaa); }
+  .lahdelista { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .lahdelista a { color: var(--turkoosi); font-size: 14px; }
+  .vire { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pallo { min-width: 28px; height: 28px; padding: 0 5px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; position: relative; }
+  .pallo.v { background: rgba(60,203,127,.18); color: var(--voitto); } .pallo.t { background: rgba(229,83,75,.16); color: var(--tappio); }
+  .pallo small { font-size: 9px; margin-left: 2px; font-weight: 600; }
+  .erorivi { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--raja); }
+  .erorivi small { display: block; color: var(--harmaa); font-size: 12.5px; }
+  .erorivi b { font-size: 20px; } .erorivi b.plus { color: var(--voitto); } .erorivi b.miinus { color: var(--tappio); }
+  .isoluku { font-size: 30px; font-weight: 800; color: var(--turkoosi); line-height: 1.1; }
+  .isoluku small { display: block; font-size: 13px; color: var(--harmaa); font-weight: 500; margin-top: 2px; }
+  .kaksi { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .kaavio { width: 100%; height: auto; }
+  .kaavio text { fill: var(--harmaa); font-size: 9px; }
+  .kaavio .k-viiva { fill: none; stroke: var(--turkoosi); stroke-width: 2.2; stroke-linejoin: round; }
+  .kaavio .k-piste { fill: var(--turkoosi); }
+  .kaavio .k-pv { stroke: var(--turkoosi); stroke-width: 1; opacity: .5; }
+  .kaavio .k-pp { stroke: var(--oranssi); stroke-width: 1; stroke-dasharray: 4 3; opacity: .7; }
+  .kaavio .k-pu { stroke: var(--tappio); stroke-width: 1; opacity: .7; }
+  details > summary { cursor: pointer; color: var(--turkoosi); font-size: 14px; margin-top: 8px; list-style: none; }
+  details > summary::before { content: "▸ "; } details[open] > summary::before { content: "▾ "; }
+  details.kortti > summary { margin: 0; color: var(--teksti); font-weight: 600; }
+  details.kortti > summary small { color: var(--harmaa); font-weight: 400; margin-left: 6px; }
+  table.porssi td:nth-child(2) { text-align: left; }
+  .uudet-viestit { color: var(--oranssi); font-weight: 700; }
+  .kolumnikortti { border-left: 4px solid #6E7FA8; }
+  .tutka-otsake { color: var(--harmaa); font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; margin: 10px 0 2px; }
+  .tutka-otsake:first-child { margin-top: 0; }
+  .tutkarivi { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--raja); }
+  .tutkarivi small { display: block; color: var(--harmaa); font-size: 12.5px; }
+  .varmuus { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; flex: none; }
+  .varmuus.vahvistettu { background: rgba(60,203,127,.15); color: var(--voitto); }
+  .varmuus.huhu { background: rgba(245,154,27,.15); color: var(--oranssi); }
+
   /* Tagit, suodattimet, asiaotsikko */
   .asiaotsikko { color: var(--turkoosi); font-size: 14.5px; margin-top: 4px; line-height: 1.35; }
   .asiaotsikko::before { content: "✦ "; font-size: 11px; }
@@ -333,6 +384,10 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
   from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js';
 import { initializeFirestore, persistentLocalCache, doc, onSnapshot, getDoc, setDoc, arrayUnion, arrayRemove }
   from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js';
+import { getMessaging, getToken, isSupported } from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-messaging.js';
+
+// Push-ilmoitusten julkinen avain (Firebase → Project settings → Cloud Messaging → Web Push certificates → Key pair)
+const VAPID = '';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAOTAEzO091EFVkDgut5lVt9u_zH1pl2pM",
@@ -364,6 +419,9 @@ let kohteet = [];
 let ottelut = null;
 let ketjut = [];
 let tiivistelma = null;
+let tilastot = null;
+let koosteet = null;
+let pelaajat = null;
 let paivitysAika = null;
 let kuuntelijat = [];
 
@@ -466,6 +524,9 @@ async function kaynnista() {
     yllapito = s.data() || null;
     if (valittu === 'yllapito') piirraYllapito();
   }, () => {}));
+  for (const [d, aseta] of [['tilastot', (x) => { tilastot = x; }], ['koosteet', (x) => { koosteet = x; }], ['pelaajat', (x) => { pelaajat = x?.pelaajat || null; }]]) {
+    kuuntelijat.push(onSnapshot(doc(db, 'kooste', d), (s) => { aseta(s.data() || null); piirra(); }, () => {}));
+  }
   kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'tiivistelma'), (s) => {
     tiivistelma = s.data() || null;
     piirra();
@@ -494,8 +555,9 @@ document.addEventListener('visibilitychange', () => {
 
 // ---------- Asetukset (profiilikohtaiset) ----------
 const VALILEHDET = { kooste: 'Kooste', uutiset: 'Uutiset', huhut: 'Huhut', keskustelut: 'Keskustelut', ottelut: 'Ottelut' };
-const OSIOT = { ottelupaiva: 'Ottelupäiväkortti', paivan: 'Päivän Pelicans', seuraava: 'Seuraava ottelu',
-  huhut: 'Kuumimmat huhut', uutiset: 'Tuoreimmat uutiset', keskustelut: 'Kuumimmat keskustelut' };
+const OSIOT = { ottelupaiva: 'Ottelupäiväkortti', ennakko: 'Otteluennakko', jalki: 'Ottelun jälkeen: mitä mediat sanoivat',
+  paivan: 'Päivän Pelicans', seuraava: 'Seuraava ottelu', huhut: 'Kuumimmat huhut', uutiset: 'Tuoreimmat uutiset',
+  keskustelut: 'Kuumimmat keskustelut', viikko: 'Viikkokooste', kolumnit: 'Asiantuntijat sanovat' };
 const OLETUS = { kompakti: false, pituus: 'lyhyt', paivaryhmat: true };
 function taydenna(a) {
   const t = { ...OLETUS, ...(a || {}) };
@@ -516,6 +578,7 @@ async function lataaAsetukset() {
   try {
     const s = await getDoc(profiiliRef());
     if (s.exists() && s.data().asetukset) asetukset = taydenna(s.data().asetukset);
+    ilmoitukset = (s.exists() && s.data().ilmoitukset) || {};
   } catch {}
   sovellaAsetukset();
 }
@@ -643,6 +706,7 @@ let avoinna = null; // { laji: 'u' | 'k', id }
 let pitkaAuki = null; // käyttäjän valinta tässä näkymässä (muuten asetus)
 
 function etsiKohde(laji, id) {
+  if (laji === 'o') return [...(ottelut?.pelatut || []), ...(ottelut?.tulevat || [])].find((o) => String(o.id) === String(id));
   return laji === 'u' ? kohteet.find((k) => k.id === id) : ketjut.find((k) => k.id === id);
 }
 
@@ -650,6 +714,7 @@ function piirraLukunakyma() {
   if (!avoinna) return;
   const k = etsiKohde(avoinna.laji, avoinna.id);
   if (!k) { suljeLukunakyma(); return; }
+  if (avoinna.laji === 'o') { $('#lukusisalto').innerHTML = otteluNakyma(k); return; }
   const ketju = avoinna.laji === 'k';
   const t = k.tiiv;
   const pitka = pitkaAuki ?? (asetukset.pituus === 'pitka');
@@ -734,12 +799,206 @@ function tulosMerkki(o) {
   return oma > vast ? `<span class="merkki v">V${lisa}</span>` : `<span class="merkki t">T${lisa}</span>`;
 }
 
+// ---------- Ottelut ja tilastot ----------
 function otteluKortti(o, iso = false) {
   const tulos = o.paattynyt || o.kaynnissa ? `<div class="tulos">${o.kotiMaalit ?? 0}–${o.vierasMaalit ?? 0}</div>` : '';
   const tila = o.kaynnissa ? '<span class="merkki live">KÄYNNISSÄ</span>' : o.paattynyt ? tulosMerkki(o) : '';
-  return `<div class="kortti${iso ? ' korostus' : ''}">
+  const lisa = o.paattynyt && o.maalit?.length ? '<span class="ai">Tapahtumat ›</span>'
+    : ottelut?.seuraavaTiedot?.id === o.id && ottelut.seuraavaTiedot.kokoonpano ? '<span class="ai">Kokoonpano ›</span>' : '';
+  const klik = lisa ? ` klikattava" data-avaa="o:${o.id}" role="button` : '';
+  return `<div class="kortti${iso ? ' korostus' : ''}${klik}">
     <div class="ottelu"><div class="joukkueet">${esc(o.koti)} – ${esc(o.vieras)}</div>${tulos}</div>
-    <div class="meta"><span>${o.aika ? otteluAika(o.aika) : ''}</span>${tila}</div>
+    <div class="meta"><span>${o.aika ? otteluAika(o.aika) : ''}</span>${tila}${o.yleiso && o.paattynyt ? `<span>· ${o.yleiso.toLocaleString('fi-FI')} katsojaa</span>` : ''}${lisa}</div>
+  </div>`;
+}
+
+const kelloAika = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function kokoonpanoHtml(kp, otsikko) {
+  if (!kp) return '';
+  return `<div class="luku-otsake">${esc(otsikko)}</div><div class="kokoonpano">
+    ${kp.ketjut.map((k) => `<div class="ketju"><b>${k.ketju}.</b><div>${k.hyokkaajat.map(esc).join(' – ')}${k.puolustajat.length ? `<small>${k.puolustajat.map(esc).join(' – ')}</small>` : ''}</div></div>`).join('')}
+    ${kp.maalivahdit.length ? `<div class="ketju"><b>MV</b><div>${kp.maalivahdit.map(esc).join(', ')}</div></div>` : ''}</div>`;
+}
+
+function otteluNakyma(o) {
+  const st = ottelut?.seuraavaTiedot?.id === o.id ? ottelut.seuraavaTiedot : null;
+  const kotiN = esc(o.koti), vierasN = esc(o.vieras);
+  const tapahtumat = [...(o.maalit || []).map((m) => ({ ...m, laji: 'maali' })), ...(o.jaahyt || []).map((j) => ({ ...j, laji: 'jaahy' }))]
+    .sort((a, b) => a.aika - b.aika);
+  let era = 0;
+  const rivit = tapahtumat.map((t) => {
+    const otsake = t.era !== era ? `<div class="era">${t.era > 3 ? 'Jatkoaika' : t.era + '. erä'}</div>` : '';
+    era = t.era;
+    const puoli = t.koti ? kotiN : vierasN;
+    return otsake + (t.laji === 'maali'
+      ? `<div class="tapahtuma maali${(t.koti === o.kotona) ? ' oma' : ''}"><span class="t-aika">${kelloAika(t.aika)}</span>
+          <span class="t-tilanne">${esc(t.tilanne)}</span><span class="t-teksti"><b>${esc(t.tekija)}</b>${t.tyyppi ? ` <em>${esc(t.tyyppi)}</em>` : ''}
+          <small>${puoli}${t.syottajat?.length ? ' · ' + t.syottajat.map(esc).join(', ') : ''}</small></span></div>`
+      : `<div class="tapahtuma jaahy"><span class="t-aika">${kelloAika(t.aika)}</span><span class="t-tilanne">${t.min}′</span>
+          <span class="t-teksti">${esc(t.pelaaja)} <small>${puoli} · ${esc(t.rike)}</small></span></div>`);
+  }).join('');
+  const jalki = koosteet?.jalki?.peliId === o.id ? koosteet.jalki : null;
+  const ennakko = koosteet?.ennakko?.peliId === o.id ? koosteet.ennakko : null;
+  return `
+    <div class="meta" style="margin:0 0 6px"><span>${o.aika ? otteluAika(o.aika) : ''}</span>${o.halli ? `<span>· ${esc(o.halli)}</span>` : ''}</div>
+    <h3 class="luku-otsikko">${kotiN} – ${vierasN}${o.paattynyt ? ` <span class="iso-tulos">${o.kotiMaalit}–${o.vierasMaalit}</span>` : ''}</h3>
+    ${o.paattynyt ? `<div class="meta">${tulosMerkki(o)}${o.yleiso ? `<span>${o.yleiso.toLocaleString('fi-FI')} katsojaa</span>` : ''}</div>` : ''}
+    ${jalki ? `<div class="luku-otsake">✦ Mitä mediat sanoivat</div><p class="luku-teksti">${esc(jalki.teksti)}</p>
+      ${jalki.lahteet?.length ? `<div class="lahdelista">${jalki.lahteet.map((l) => `<a href="${esc(l.linkki)}" target="_blank" rel="noopener">${esc(l.lahde)}: ${esc(l.otsikko)} ↗</a>`).join('')}</div>` : ''}` : ''}
+    ${ennakko ? `<div class="luku-otsake">✦ Otteluennakko</div><p class="luku-teksti">${esc(ennakko.teksti)}</p>
+      <ul class="pointit">${(ennakko.pointit || []).map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
+    ${tapahtumat.length ? `<div class="luku-otsake">Tapahtumat</div><div class="tapahtumat">${rivit}</div>` : ''}
+    ${o.maalivahdit?.length ? `<div class="luku-otsake">Pelicansin maalivahdit</div>${o.maalivahdit.map((m) =>
+      `<div class="mvrivi">${esc(m.nimi)} <span>${m.torjunnat} torjuntaa · ${m.paastetyt} päästettyä${m.torjunnat + m.paastetyt ? ` · ${(m.torjunnat / (m.torjunnat + m.paastetyt) * 100).toFixed(1)} %` : ''}</span></div>`).join('')}` : ''}
+    ${st ? `${kokoonpanoHtml(st.kokoonpano, 'Pelicansin kokoonpano')}${kokoonpanoHtml(st.vastustajanKokoonpano, (o.kotona ? o.vieras : o.koti) + ' – kokoonpano')}
+      ${st.poissa?.length ? `<div class="huom">Poissa (Liiga): ${st.poissa.map(esc).join(', ')}</div>` : ''}
+      ${!st.kokoonpano ? '<div class="huom">Kokoonpanot julkaistaan yleensä vähän ennen ottelua. Ne päivittyvät tähän keräyksen mukana.</div>' : ''}` : ''}
+    ${o.liput && !o.paattynyt ? `<a class="nappi linkkinappi" href="${esc(o.liput)}" target="_blank" rel="noopener">Liput ↗</a>` : ''}`;
+}
+
+const prosentti = (x, d = 1) => (x == null ? '–' : (x * 100).toFixed(d).replace('.', ',') + ' %');
+
+function vireHtml() {
+  const v = tilastot?.vire || [];
+  if (!v.length) return '';
+  return `<div class="kortti"><div class="vire">${v.map((x) =>
+    `<span class="pallo ${x.v ? 'v' : 't'}" title="${esc(x.vastustaja)} ${x.tulos}${x.r ? ' ' + x.r : ''}">${x.v ? 'V' : 'T'}${x.r ? `<small>${x.r}</small>` : ''}</span>`).join('')}</div>
+    <div class="meta">10 viimeisintä, vanhin vasemmalla · ${v.reduce((s, x) => s + x.p, 0)} pistettä</div></div>`;
+}
+
+function pisteerotHtml() {
+  const e = tilastot?.pisteerot || [];
+  if (!e.length) return '';
+  return `<div class="kortti">${e.map((r) => `<div class="erorivi">
+      <span>${esc(r.nimi)}<small>${r.sija}. ${esc(r.joukkue)} · ${r.pisteet} p</small></span>
+      <b class="${r.ero >= 0 ? 'plus' : 'miinus'}">${r.ero > 0 ? '+' : ''}${r.ero} p</b></div>
+      ${r.otteluero ? `<div class="vihje" style="margin:-4px 0 6px">Pelicansilla ${Math.abs(r.otteluero)} ottelua ${r.otteluero < 0 ? 'vähemmän' : 'enemmän'} pelattuna</div>` : ''}`).join('')}</div>`;
+}
+
+function ennusteHtml() {
+  const e = tilastot?.ennuste || [];
+  const p = e.find((r) => /pelicans/i.test(r.joukkue));
+  if (!p) return '';
+  return `<div class="kortti"><div class="isoluku">${p.sija}.<small>ennustettu sija · ${p.pisteet} p / ${p.ottelut} ott.</small></div>
+    <div class="vihje" style="margin:6px 0 0">Laskettu jokaisen joukkueen nykyisellä pistetahdilla koko runkosarjalle. Suuntaa antava.</div>
+    <details><summary>Koko ennustetaulukko</summary><table><tbody>${e.map((r) =>
+      `<tr class="${/pelicans/i.test(r.joukkue) ? 'oma' : ''}"><td>${r.sija}</td><td>${esc(r.joukkue)}</td><td>${r.pisteet}</td></tr>`).join('')}</tbody></table></details></div>`;
+}
+
+function kaavioHtml() {
+  const k = (tilastot?.kaavio || []).filter((x) => x.sija);
+  if (k.length < 2) return '';
+  const n = Math.max(17, ...k.map((x) => x.sija));
+  const L = 300, K = 140, vasen = 22, ala = 16;
+  const x = (i) => vasen + (i / (k.length - 1)) * (L - vasen - 6);
+  const y = (s) => 6 + ((s - 1) / (n - 1)) * (K - ala - 6);
+  const rajat = ottelut?.rajat || [4, 12, 14];
+  const viivat = rajat.map((r, i) => `<line x1="${vasen}" x2="${L}" y1="${y(r + 0.5)}" y2="${y(r + 0.5)}" class="${['k-pv', 'k-pp', 'k-pu'][i] || 'k-pp'}"/>`).join('');
+  const polku = k.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.sija).toFixed(1)}`).join(' ');
+  return `<div class="kortti"><svg viewBox="0 0 ${L} ${K}" class="kaavio" role="img" aria-label="Sijoituksen kehitys">
+    ${[1, 5, 10, 15].filter((s) => s <= n).map((s) => `<text x="2" y="${y(s) + 4}">${s}</text>`).join('')}
+    ${viivat}<path d="${polku}" class="k-viiva"/>
+    ${k.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.sija)}" r="${i === k.length - 1 ? 4 : 2.2}" class="k-piste"><title>${p.n}. ottelu: sija ${p.sija}</title></circle>`).join('')}
+    <text x="${vasen}" y="${K - 2}">1. ottelu</text><text x="${L}" y="${K - 2}" text-anchor="end">${k.length}. ottelu</text>
+  </svg><div class="vihje" style="margin:4px 0 0">Sija jokaisen Pelicans-ottelun jälkeen (laskettu otteluista).</div></div>`;
+}
+
+function yvavHtml() {
+  const y = tilastot?.yvav;
+  if (!y) return '';
+  return `<div class="kortti kaksi"><div><div class="isoluku">${prosentti(y.yv)}<small>Ylivoima · sija ${y.yvSija}/${y.joukkueita}</small></div><div class="vihje" style="margin:2px 0 0">Liigan ka. ${prosentti(y.yvKa)}</div></div>
+    <div><div class="isoluku">${prosentti(y.av)}<small>Alivoima · sija ${y.avSija}/${y.joukkueita}</small></div><div class="vihje" style="margin:2px 0 0">Liigan ka. ${prosentti(y.avKa)}</div></div></div>`;
+}
+
+function porssiHtml() {
+  const p = tilastot?.porssi || [];
+  if (!p.length) return '';
+  const rivi = (x, i) => `<tr><td>${i + 1}</td><td>${esc(x.nimi)}${x.loukkaantunut ? ' 🩹' : ''}${x.pelikielto ? ' ⛔' : ''}</td><td>${x.o}</td><td>${x.m}</td><td>${x.s}</td><td><b>${x.p}</b></td><td>${x.pm > 0 ? '+' : ''}${x.pm}</td></tr>`;
+  return `<div class="kortti"><table class="porssi"><thead><tr><th>#</th><th>Pelaaja</th><th>O</th><th>M</th><th>S</th><th>P</th><th>+/-</th></tr></thead>
+    <tbody>${p.slice(0, 10).map(rivi).join('')}</tbody></table>
+    ${p.length > 10 ? `<details><summary>Kaikki ${p.length} pelaajaa</summary><table class="porssi"><tbody>${p.slice(10).map((x, i) => rivi(x, i + 10)).join('')}</tbody></table></details>` : ''}</div>`;
+}
+
+function maalivahdatHtml() {
+  const m = tilastot?.maalivahdit || [];
+  if (!m.length) return '';
+  return `<div class="kortti"><table><thead><tr><th></th><th>Maalivahti</th><th>O</th><th>T%</th><th>PKA</th></tr></thead><tbody>${m.map((x) =>
+    `<tr><td></td><td>${esc(x.nimi)}</td><td>${x.ottelut}</td><td>${prosentti(x.torjuntaProsentti)}</td><td>${x.paastetytKa != null ? x.paastetytKa.toFixed(2).replace('.', ',') : '–'}</td></tr>`).join('')}</tbody></table>
+    <div class="vihje" style="margin:6px 0 0">T% = torjuntaprosentti, PKA = päästetyt maalit / 60 min.</div></div>`;
+}
+
+function pieniTaulukko(lista, otsikko, sarake = 'P') {
+  return `<details class="kortti"><summary>${otsikko}${(() => { const p = lista.find((r) => /pelicans/i.test(r.joukkue)); return p ? ` <small>Pelicans ${p.sija}.</small>` : ''; })()}</summary>
+    <table><tbody>${lista.map((r) => `<tr class="${/pelicans/i.test(r.joukkue) ? 'oma' : ''}"><td>${r.sija}</td><td>${esc(r.joukkue)}</td><td>${r.ottelut}</td><td>${r.pisteet}</td></tr>`).join('')}</tbody></table></details>`;
+}
+
+function keskinaisetHtml() {
+  const t = tilastot;
+  if (!t?.vastustaja) return '';
+  return `<div class="kortti"><div class="otsikko" style="font-size:16px">Pelicans vs. ${esc(t.vastustaja)} tällä kaudella</div>
+    ${t.keskinaiset?.length ? `<div class="vire" style="margin-top:8px">${t.keskinaiset.map((x) => `<span class="pallo ${x.v ? 'v' : 't'}" title="${x.koti ? 'koti' : 'vieras'}">${x.tulos}${x.r ? `<small>${x.r}</small>` : ''}</span>`).join('')}</div>`
+      : '<div class="vihje" style="margin:6px 0 0">Ei vielä kohtaamisia tällä kaudella.</div>'}</div>`;
+}
+
+// ---------- Koosteet (viikko, ennakko, jälki, kolumnit) ----------
+function koosteKortti(k, otsake, luokka = 'korostus', lisa = '') {
+  if (!k) return '';
+  return `<h2>${otsake}</h2><div class="kortti ${luokka}">
+    <div class="otsikko" style="font-size:16.5px">${esc(k.otsikko)}</div>
+    <div class="tiivis" style="margin-top:6px">${esc(k.teksti)}</div>
+    ${k.pointit?.length ? `<details><summary>Tärkeimmät kohdat</summary><ul class="pointit">${k.pointit.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></details>` : ''}
+    ${k.lahteet?.length ? `<details><summary>Lähteet (${k.lahteet.length})</summary><div class="lahdelista">${k.lahteet.map((l) => `<a href="${esc(l.linkki)}" target="_blank" rel="noopener">${esc(l.lahde)}: ${esc(l.otsikko)} ↗</a>`).join('')}</div></details>` : ''}
+    ${lisa}
+    <div class="meta"><span>Tekoälyn kooste ${aikaTeksti(k.tehty)}</span></div></div>`;
+}
+const ennakkoAjankohtainen = () => {
+  const e = koosteet?.ennakko, o = ottelut?.tulevat?.[0];
+  return e && o && e.peliId === o.id && o.aika > Date.now() - 3 * 3600e3 ? e : null;
+};
+const jalkiAjankohtainen = () => {
+  const j = koosteet?.jalki;
+  return j && Date.now() - j.aika < 4 * 864e5 ? j : null;
+};
+
+// ---------- Siirtotutka ja huhut pelaajittain ----------
+function siirtotutka() {
+  const viimeisin = new Map();
+  for (const k of [...kohteet].filter(nakyvaUutinen).sort((a, b) => a.aika - b.aika)) {
+    for (const s of k.siirrot || []) {
+      const ed = viimeisin.get(s.pelaaja);
+      // vahvistettu tieto voittaa huhun; muuten uusin voittaa
+      if (ed && ed.varmuus === 'vahvistettu' && s.varmuus === 'huhu') continue;
+      viimeisin.set(s.pelaaja, { ...s, juttu: k });
+    }
+  }
+  const ryhmat = { tulossa: [], lahdossa: [], jatkaa: [] };
+  for (const s of viimeisin.values()) (ryhmat[s.suunta] || ryhmat.tulossa).push(s);
+  const nimet = { tulossa: '⬇ Tulossa Pelicansiin', lahdossa: '⬆ Lähdössä', jatkaa: '✍ Jatkosopimukset' };
+  const rivit = Object.entries(ryhmat).filter(([, l]) => l.length).map(([r, l]) => `<div class="tutka-otsake">${nimet[r]}</div>${l.map((s) =>
+    `<div class="tutkarivi klikattava" data-avaa="u:${esc(s.juttu.id)}"><span><b>${esc(s.pelaaja)}</b><small>${[s.seura, s.sopimus].filter(Boolean).map(esc).join(' · ')}</small></span>
+      <span class="varmuus ${s.varmuus}">${s.varmuus === 'vahvistettu' ? 'Vahvistettu' : 'Huhu'}</span></div>`).join('')}`).join('');
+  return rivit ? `<h2>Siirtotutka</h2><div class="kortti">${rivit}<div class="vihje" style="margin:8px 0 0">Koottu uutisista tekoälyllä – voi olla puutteellinen. Napauta nähdäksesi lähdejutun.</div></div>` : '';
+}
+
+function huhutPelaajittain() {
+  const laskuri = {};
+  for (const k of ketjut.filter(nakyvaKetju)) for (const p of k.pelaajat || []) laskuri[p] = (laskuri[p] || 0) + 1;
+  for (const k of kohteet.filter((x) => nakyvaUutinen(x) && x.luokka === 'siirto')) for (const p of k.pelaajat || []) laskuri[p] = (laskuri[p] || 0) + 1;
+  const lista = Object.entries(laskuri).sort((a, b) => b[1] - a[1]).slice(0, 16);
+  if (!lista.length) return '';
+  return `<h2>Huhut pelaajittain</h2><div class="tagit">${lista.map(([p, n]) =>
+    `<button class="tagi pelaaja" data-suodata="pelaaja:${esc(p)}">${esc(p)} <small>${n}</small></button>`).join('')}</div>`;
+}
+
+function pelaajaYhteenveto(nimi) {
+  const p = pelaajat?.[nimi];
+  const t = (tilastot?.porssi || []).find((x) => x.nimi === nimi);
+  if (!p && !t) return '';
+  return `<div class="kortti korostus">
+    ${t ? `<div class="meta" style="margin:0 0 6px"><span>#${t.nro || ''} · ${t.o} ott. · ${t.m}+${t.s}=${t.p} · ${t.pm > 0 ? '+' : ''}${t.pm}</span></div>` : ''}
+    ${p ? `<div class="tiivis">${esc(p.teksti)}</div>${p.pointit?.length ? `<ul class="pointit">${p.pointit.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      <div class="meta"><span>✦ Tekoälyn yhteenveto ${p.maara} maininnasta · ${aikaTeksti(p.tehty)}</span></div>`
+      : '<div class="vihje" style="margin:0">Yhteenveto tehdään, kun pelaajasta on vähintään kaksi mainintaa.</div>'}
   </div>`;
 }
 
@@ -748,7 +1007,10 @@ function ketjuKortti(k) {
   const maininta = !k.pelicansKetju && k.maininnat ? `<span>·</span><span>Pelicans mainittu ${k.maininnat} krt</span>` : '';
   return `<div class="kortti klikattava${ketjuUusi(k) ? ' uusi' : ''}" data-avaa="k:${esc(k.id)}" role="button" tabindex="0">
     <div class="otsikko">${esc(k.otsikko)}</div>
-    <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>uutta ${aikaTeksti(k.muuttunut)}</span>${maininta}${aiMerkki(k)}</div>
+    ${k.tiiv?.asiaotsikko || k.asiaotsikko ? asiaRivi(k) : ''}
+    <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>uutta ${aikaTeksti(k.muuttunut)}</span>
+      ${k.uusiaViesteja ? `<span class="uudet-viestit">+${k.uusiaViesteja} viestiä</span>` : ''}
+      ${k.vastaukset != null ? `<span>· ${k.vastaukset} vastausta</span>` : ''}${maininta}${aiMerkki(k)}</div>
   </div>`;
 }
 
@@ -828,17 +1090,18 @@ function ottelupaivaKortti(o) {
 
 // ---------- Sarjataulukko: rajat kaudelle 2026–27 (17 joukkuetta) ----------
 // 1–4 suoraan puolivälieriin, 5–12 pudotuspelien 1. kierros (neljännesvälierät), kolme viimeistä putoaa suoraan
-const SARJA = { suoraanPV: 4, pudotuspelit: 12, putoavia: 3 };
-function taulukonRivi(r, i, kaikki) {
+// Rajat tulevat Liigasta (playoffsLines), oletus kaudelle 2026–27: 4 (puolivälierät), 12 (pudotuspelit), 14 (viimeinen säilyvä)
+const rajat = () => (ottelut?.rajat?.length >= 3 ? ottelut.rajat : [4, 12, 14]);
+function taulukonRivi(r, i) {
   const sija = Number(r.sija) || i + 1;
-  const ekaPutoava = kaikki.length - SARJA.putoavia + 1;
+  const [pv, pp, sailyy] = rajat();
   const luokat = [/pelicans/i.test(r.joukkue) ? 'oma' : ''];
-  if (sija <= SARJA.suoraanPV) luokat.push('pv');
-  else if (sija <= SARJA.pudotuspelit) luokat.push('pp');
-  else if (sija >= ekaPutoava) luokat.push('putoaa');
-  if (sija === SARJA.suoraanPV) luokat.push('raja-pv');
-  if (sija === SARJA.pudotuspelit) luokat.push('raja-pp');
-  if (sija === ekaPutoava - 1) luokat.push('raja-ps');
+  if (sija <= pv) luokat.push('pv');
+  else if (sija <= pp) luokat.push('pp');
+  else if (sija > sailyy) luokat.push('putoaa');
+  if (sija === pv) luokat.push('raja-pv');
+  if (sija === pp) luokat.push('raja-pp');
+  if (sija === sailyy) luokat.push('raja-ps');
   return `<tr class="${luokat.join(' ')}"><td>${esc(sija)}</td><td>${esc(r.joukkue)}</td><td>${esc(r.ottelut ?? '')}</td><td>${esc(r.pisteet ?? '')}</td></tr>`;
 }
 
@@ -920,6 +1183,10 @@ function piirra() {
     paivan: `<h2>Päivän Pelicans</h2>${tiivistelmaKortti(tiivistelma?.uutiset)}
       ${uusia ? `<div class="vihje">Edellisen käyntisi jälkeen on tullut <b>${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.</div>` : ''}`,
     seuraava: seuraava ? `<h2>Seuraava ottelu</h2>${otteluKortti(seuraava, true)}` : '',
+    ennakko: koosteKortti(ennakkoAjankohtainen(), 'Otteluennakko'),
+    jalki: koosteKortti(jalkiAjankohtainen(), 'Ottelun jälkeen: mitä mediat sanoivat'),
+    viikko: koosteet?.viikko && Date.now() - koosteet.viikko.tehty < 7 * 864e5 ? koosteKortti(koosteet.viikko, 'Viikkokooste') : '',
+    kolumnit: koosteet?.kolumnit ? koosteKortti(koosteet.kolumnit, 'Asiantuntijat sanovat', 'kolumnikortti') : '',
     huhut: tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : '',
     uutiset: `<h2>Tuoreimmat uutiset</h2>${uutiset.slice(0, 3).map(uutisKortti).join('') || tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.')}`,
     keskustelut: ketjutJarj.length ? `<h2>Kuumimmat keskustelut</h2>${ketjutJarj.slice(0, 3).map(ketjuKortti).join('')}` : '',
@@ -937,7 +1204,7 @@ function piirra() {
         `<button class="siru${suodatin.luokka === l ? ' valittu' : ''}" data-suodata="luokka:${l}">${LUOKKA_NIMI[l]} <small>${luokatMaarat[l]}</small></button>`).join('')}
     </div>` : '';
   const pelaajaRivi = suodatin.pelaaja ? `<div class="suodatinrivi">Pelaaja: <b>${esc(suodatin.pelaaja)}</b>
-      <button class="tagi" data-suodata="pelaaja:">✕ Poista suodatin</button></div>` : '';
+      <button class="tagi" data-suodata="pelaaja:">✕ Poista suodatin</button></div>${pelaajaYhteenveto(suodatin.pelaaja)}` : '';
   $('[data-nakyma="uutiset"]').innerHTML = uutiset.length
     ? `${sirut}${pelaajaRivi}<h2>Uutiset · ${suodatetut.length}</h2>${ryhmitelty(suodatetut, uutisKortti) || tyhja('Ei osumia', 'Tällä suodattimella ei löytynyt uutisia.')}`
     : tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.');
@@ -947,6 +1214,8 @@ function piirra() {
     <h2>Huhumylly</h2>
     ${tiivistelmaKortti(tiivistelma?.huhut, true)}
     ${tiivistelma?.kuumimmatHuhut?.length ? `<h2>Kuumimmat huhut</h2>${huhuLinkit()}` : ''}
+    ${siirtotutka()}
+    ${huhutPelaajittain()}
     ${ketjutJarj.length ? `<h2>Huhuja käsittelevät keskustelut</h2>${ketjutJarj.map(ketjuKortti).join('')}` : ''}
   `;
 
@@ -963,20 +1232,31 @@ function piirra() {
     const taulukko = rivit.map(taulukonRivi).join('');
     $('[data-nakyma="ottelut"]').innerHTML = `
       ${paivan ? ottelupaivaKortti(paivan) : ''}
-      ${ottelut.tulevat?.length ? `<h2>Tulevat</h2>${otteluKortti(ottelut.tulevat[0], true)}${ottelut.tulevat.slice(1).map((o) => otteluKortti(o)).join('')}` : ''}
-      ${ottelut.pelatut?.length ? `<h2>Viimeisimmät</h2>${ottelut.pelatut.map((o) => otteluKortti(o)).join('')}` : ''}
+      ${koosteKortti(ennakkoAjankohtainen(), 'Otteluennakko')}
+      ${ottelut.tulevat?.length ? `<h2>Tulevat</h2>${otteluKortti(ottelut.tulevat[0], true)}${ottelut.tulevat.slice(1, 4).map((o) => otteluKortti(o)).join('')}` : ''}
+      ${keskinaisetHtml()}
+      ${ottelut.pelatut?.length ? `<h2>Viimeisimmät</h2>${ottelut.pelatut.slice(0, 5).map((o) => otteluKortti(o)).join('')}` : ''}
+      ${tilastot?.vire?.length ? `<h2>Vire</h2>${vireHtml()}` : ''}
       ${taulukko ? `<h2>Sarjataulukko</h2><div class="kortti"><table>
         <thead><tr><th>#</th><th>Joukkue</th><th>O</th><th>P</th></tr></thead><tbody>${taulukko}</tbody></table>
         <div class="selite">
-          <span><i class="s-pv"></i>1–${SARJA.suoraanPV} puolivälierät</span>
-          <span><i class="s-pp"></i>${SARJA.suoraanPV + 1}–${SARJA.pudotuspelit} neljännesvälierät</span>
-          <span><i class="s-pu"></i>${rivit.length - SARJA.putoavia + 1}–${rivit.length} putoaa</span>
+          <span><i class="s-pv"></i>1–${rajat()[0]} puolivälierät</span>
+          <span><i class="s-pp"></i>${rajat()[0] + 1}–${rajat()[1]} neljännesvälierät</span>
+          <span><i class="s-pu"></i>${rajat()[2] + 1}–${rivit.length} putoaa</span>
         </div></div>` : ''}
+      ${tilastot?.pisteerot?.length ? `<h2>Pisteero viivoihin</h2>${pisteerotHtml()}` : ''}
+      ${tilastot?.kaavio?.length > 1 ? `<h2>Sijoituksen kehitys</h2>${kaavioHtml()}` : ''}
+      ${tilastot?.ennuste?.length ? `<h2>Ennuste</h2>${ennusteHtml()}` : ''}
+      ${tilastot?.yvav ? `<h2>Erikoistilanteet</h2>${yvavHtml()}` : ''}
+      ${tilastot?.porssi?.length ? `<h2>Pistepörssi</h2>${porssiHtml()}` : ''}
+      ${tilastot?.maalivahdit?.length ? `<h2>Maalivahdit</h2>${maalivahdatHtml()}` : ''}
+      ${tilastot?.kuntopuntari?.length ? `<h2>Muut taulukot</h2>${pieniTaulukko(tilastot.kuntopuntari, 'Kuntopuntari (10 viim.)')}${pieniTaulukko(tilastot.koti, 'Kotitaulukko')}${pieniTaulukko(tilastot.vieras, 'Vierastaulukko')}` : ''}
     `;
   }
   if (valittu === 'yllapito') piirraYllapito();
   piirraLukunakyma();
   hallitseLive();
+  if (odottavaHash) kasitteleHash();
 }
 
 // ---------- Asetukset-sivu ----------
@@ -1025,6 +1305,7 @@ function piirraAsetukset() {
 }
 
 $('[data-nakyma="asetukset"]').addEventListener('change', (e) => {
+  if (e.target.dataset.ilmoitus) return tallennaIlmoitukset({ [e.target.dataset.ilmoitus]: e.target.checked });
   const a = e.target.dataset.asetus;
   if (a) { asetukset[a] = e.target.checked; tallennaAsetukset(); }
   const n = e.target.dataset.nakyvyys;
@@ -1038,6 +1319,7 @@ $('[data-nakyma="asetukset"]').addEventListener('click', (e) => {
   const b = e.target.closest('button');
   if (!b) return;
   if (b.dataset.takaisin !== undefined) return history.back();
+  if (b.dataset.otaIlmoitukset !== undefined) return otaIlmoituksetKayttoon();
   if (b.dataset.pituus) { asetukset.pituus = b.dataset.pituus; tallennaAsetukset(); piirraAsetukset(); }
   if (b.dataset.siirra) {
     const [kentta, id, suunta] = b.dataset.siirra.split(':');
@@ -1061,6 +1343,42 @@ $('[data-nakyma="asetukset"]').addEventListener('click', (e) => {
 });
 
 let pikalinkit = [];
+
+// ---------- Push-ilmoitukset ----------
+let ilmoitukset = {};
+async function otaIlmoituksetKayttoon() {
+  try {
+    if (!VAPID) return naytaIlmoitus('Ilmoitusavain puuttuu vielä sovelluksesta');
+    if (!('Notification' in window) || !(await isSupported())) return naytaIlmoitus('Tämä selain ei tue ilmoituksia');
+    const lupa = await Notification.requestPermission();
+    if (lupa !== 'granted') return naytaIlmoitus('Ilmoituslupaa ei annettu – salli ilmoitukset puhelimen asetuksista');
+    const reg = await navigator.serviceWorker.ready;
+    const token = await getToken(getMessaging(app), { vapidKey: VAPID, serviceWorkerRegistration: reg });
+    if (!token) throw new Error('ei tunnusta');
+    ilmoitukset = { tulos: true, isot: true, ...ilmoitukset, token, paivitetty: Date.now() };
+    await setDoc(profiiliRef(), { ilmoitukset }, { merge: true });
+    naytaIlmoitus('Ilmoitukset otettu käyttöön');
+  } catch (e) { naytaIlmoitus('Ilmoitusten käyttöönotto epäonnistui: ' + (e.message || e)); }
+  piirraAsetukset();
+}
+function tallennaIlmoitukset(muutos) {
+  ilmoitukset = { ...ilmoitukset, ...muutos };
+  setDoc(profiiliRef(), { ilmoitukset }, { merge: true }).catch(() => {});
+  piirraAsetukset();
+}
+
+// Ilmoituksesta avaaminen: #ottelut tai #u:<id>
+let odottavaHash = location.hash;
+function kasitteleHash() {
+  const h = decodeURIComponent((odottavaHash || '').replace(/^#/, ''));
+  if (!h) return;
+  if (VALILEHDET[h]) { valitse(h); odottavaHash = ''; return; }
+  const [laji, ...id] = h.split(':');
+  if (['u', 'k', 'o'].includes(laji) && etsiKohde(laji, id.join(':'))) { odottavaHash = ''; avaaLukunakyma(laji, id.join(':')); }
+}
+navigator.serviceWorker?.addEventListener('message', (e) => {
+  if (e.data?.avaa) { odottavaHash = new URL(e.data.avaa).hash; kasitteleHash(); }
+});
 function tallennaPikalinkit(lista) {
   pikalinkit = lista;
   setDoc(doc(db, 'yhteiset', 'pikalinkit'), { linkit: lista }, { merge: true })

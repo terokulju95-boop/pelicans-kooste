@@ -97,8 +97,22 @@ const SKEEMA = {
     luokka: { type: 'STRING', enum: LUOKAT },
     pelaajat: { type: 'ARRAY', items: { type: 'STRING' } },
     tarkeys: { type: 'INTEGER' },
+    siirrot: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          pelaaja: { type: 'STRING' },
+          suunta: { type: 'STRING', enum: ['tulossa', 'lahdossa', 'jatkaa'] },
+          seura: { type: 'STRING' },
+          sopimus: { type: 'STRING' },
+          varmuus: { type: 'STRING', enum: ['vahvistettu', 'huhu'] },
+        },
+        required: ['pelaaja', 'suunta', 'varmuus'],
+      },
+    },
   },
-  required: ['asiaotsikko', 'lyhyt', 'tiivistelma', 'pointit', 'vajaa', 'luokka', 'pelaajat', 'tarkeys'],
+  required: ['asiaotsikko', 'lyhyt', 'tiivistelma', 'pointit', 'vajaa', 'luokka', 'pelaajat', 'tarkeys', 'siirrot'],
 };
 
 const OHJE_UUTINEN = `Tiivistät suomeksi jääkiekkouutisen Lahden Pelicans -faneille.
@@ -110,10 +124,12 @@ const OHJE_UUTINEN = `Tiivistät suomeksi jääkiekkouutisen Lahden Pelicans -fa
 - "luokka": otteluraportti (ottelun kulku/tulos), siirto (pelaajahankinnat, sopimukset, lähdöt, huhut siirroista, valmentajavaihdokset), loukkaantuminen, talous (seuran talous, omistajat, yleisö, areena), juniorit (nuoret ja junioritoiminta), kolumni (mielipide- tai asiantuntija-analyysi), muu.
 - "pelaajat": jutussa mainitut pelaajat, valmentajat ja seurajohdon henkilöt koko nimellä (enintään 6, tärkein ensin).
 - "tarkeys": 1–5. 5 = iso uutinen Pelicansille (pelaajasiirto, valmentajavaihdos, vakava loukkaantuminen, seuran talouskriisi). 3 = tavallinen ottelu-uutinen. 1 = sivumaininta.
+- "siirrot": Pelicansia koskevat pelaaja- ja valmentajasiirrot sekä sopimukset jutussa: pelaaja (koko nimi), suunta (tulossa = siirtyy Pelicansiin, lahdossa = lähtee Pelicansista, jatkaa = jatkosopimus Pelicansissa), seura (toinen seura, jos mainitaan), sopimus (esim. "kauden 2027–28 loppuun", jos mainitaan), varmuus (vahvistettu = seura tai pelaaja vahvistanut, huhu = tietojen mukaan / spekulaatio). Tyhjä lista, jos siirtoja ei ole.
 - Käytä vain annettua tekstiä. Älä keksi mitään. Älä lainaa pitkiä pätkiä sanatarkasti.`;
 
 const OHJE_OTSIKKO = `Luokittelet suomeksi jääkiekkouutisen Lahden Pelicans -faneille pelkän otsikon (ja mahdollisen lyhyen kuvauksen) perusteella.
 Täytä kentät samoin säännöin kuin koko jutulle, mutta: "lyhyt" ja "tiivistelma" = tyhjä merkkijono, "pointit" = tyhjä lista, "vajaa" = true.
+"siirrot": vain jos otsikko kertoo selvästi Pelicansin siirrosta tai sopimuksesta (suunta tulossa/lahdossa/jatkaa, varmuus vahvistettu/huhu).
 "asiaotsikko": selkeä asiaotsikko otsikon perusteella. "luokka", "pelaajat" ja "tarkeys" otsikon perusteella. Älä keksi mitään, mitä otsikossa ei ole.
 Luokat: otteluraportti, siirto, loukkaantuminen, talous, juniorit, kolumni, muu. Tärkeys 1–5 (5 = iso uutinen Pelicansille).`;
 
@@ -158,6 +174,9 @@ async function gemini(ohje, sisalto) {
         luokka: LUOKAT.includes(j.luokka) ? j.luokka : 'muu',
         pelaajat: (j.pelaajat || []).map((p) => String(p).trim()).filter((p) => p.length > 3 && p.length < 50).slice(0, 6),
         tarkeys: Math.min(5, Math.max(1, Number(j.tarkeys) || 2)),
+        siirrot: (j.siirrot || []).filter((x) => x?.pelaaja && x.suunta).slice(0, 8).map((x) => ({
+          pelaaja: String(x.pelaaja).slice(0, 60), suunta: x.suunta, seura: String(x.seura || '').slice(0, 40),
+          sopimus: String(x.sopimus || '').slice(0, 60), varmuus: x.varmuus === 'vahvistettu' ? 'vahvistettu' : 'huhu' })),
       };
     } catch (e) {
       await kirjaaGemini(db, false);
@@ -170,8 +189,9 @@ async function gemini(ohje, sisalto) {
 
 // Erottelee Geminin vastauksesta kohteen tiedot (luokka, pelaajat…) ja tiivistelmän
 function tallennaTulos(k, t, lisa = {}) {
-  const { asiaotsikko, luokka, pelaajat, tarkeys, ...tiiv } = t;
+  const { asiaotsikko, luokka, pelaajat, tarkeys, siirrot, ...tiiv } = t;
   Object.assign(k, { luokka, pelaajat, tarkeys });
+  if (siirrot?.length) k.siirrot = siirrot;
   if (asiaotsikko) k.asiaotsikko = asiaotsikko;
   if (!lisa.vainLuokitus) k.tiiv = { ...tiiv, tehty: Date.now(), ...lisa };
 }
@@ -184,7 +204,29 @@ async function luokitteleOtsikosta(k) {
   k.luokiteltu = true;
 }
 
+// Liigan uutisten tekstit rajapinnasta (sivu itse latautuu JavaScriptillä, joten sitä ei voi lukea suoraan)
+let liigaTekstit = null;
+async function liigaTeksti(id) {
+  if (!liigaTekstit) {
+    liigaTekstit = new Map();
+    try {
+      const d = JSON.parse((await hae('https://liiga.fi/api/v2/news?limit=60')).teksti);
+      for (const a of d.articles || []) liigaTekstit.set(a.id, a.searchText || '');
+    } catch (e) { console.warn('  ⚠ Liigan uutiset:', e.message); }
+  }
+  return liigaTekstit.get(id) || '';
+}
+
 async function kasitteleUutinen(k) {
+  if (k.liigaId) {
+    const teksti = await liigaTeksti(k.liigaId);
+    if (teksti.length < 200) { k.tiiv = { eiSaatavilla: true, syy: 'Liigan uutisen tekstiä ei saatu.', tehty: Date.now() }; await luokitteleOtsikosta(k); return; }
+    const t = await gemini(OHJE_UUTINEN, `Lähde: Liiga.fi\nOtsikko: ${k.otsikko}\n\nTeksti:\n${teksti.slice(0, TEKSTI_MAX)}`);
+    if (!t) throw new Error('Gemini ei vastannut');
+    tallennaTulos(k, t);
+    k.luokiteltu = true;
+    return;
+  }
   let linkki = k.linkki;
   if (k.google) {
     try {

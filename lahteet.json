@@ -32,14 +32,6 @@
     "kuvaus": false
   },
   {
-    "id": "google-liigafi",
-    "nimi": "Liiga.fi",
-    "tyyppi": "uutinen",
-    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=Pelicans+site:liiga.fi",
-    "google": true,
-    "kuvaus": false
-  },
-  {
     "id": "google-uusilahti",
     "nimi": "Uusi Lahti",
     "tyyppi": "uutinen",
@@ -85,13 +77,18 @@
     "maksumuuri": true
   },
   {
-    "id": "pelicans-fi",
+    "id": "liiga",
+    "nimi": "Liiga.fi",
+    "tyyppi": "uutinen",
+    "tapa": "liiga",
+    "url": "https://liiga.fi/api/v2/news?limit=40"
+  },
+  {
+    "id": "google-pelicansfi",
     "nimi": "Pelicans.fi",
     "tyyppi": "uutinen",
-    "tapa": "pelicansfi",
-    "sivut": [
-      "https://www.pelicans.fi/",
-      "https://www.pelicans.fi/uutiset"
-    ]
+    "url": "https://news.google.com/rss/search?hl=fi&gl=FI&ceid=FI:fi&q=site:pelicans.fi",
+    "google": true,
+    "kuvaus": false
   }
 ]
