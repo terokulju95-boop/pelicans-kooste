@@ -1,0 +1,31 @@
+name: Kerää
+
+on:
+  schedule:
+    # UTC-aikaa: 5–21 UTC = klo 7–23 Suomen talviaikaa. Minuutit 7 ja 37 välttävät tasatuntien ruuhkan.
+    - cron: '7,37 5-21 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: keraa
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write   # keepalive: estää GitHubia pysäyttämästä ajastusta 60 päivän jälkeen
+
+jobs:
+  keraa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/keraa.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - uses: gautamkrishnar/keepalive-workflow@v2
