@@ -50,13 +50,67 @@
   a.kortti:active { background: var(--kortti2); }
   .kortti .otsikko { font-size: 18px; font-weight: 600; line-height: 1.3; }
   .kortti .kuvaus { color: #C3CED6; font-size: 15px; margin-top: 6px; }
-  .kortti .meta { color: var(--harmaa); font-size: 13px; margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .meta { color: var(--harmaa); font-size: 13px; margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .kortti.uusi { border-color: rgba(245,154,27,.55); }
   .piste { width: 9px; height: 9px; border-radius: 50%; background: var(--oranssi); display: inline-block; flex: none; }
   .kortti.uusi .otsikko::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
     background: var(--oranssi); margin-right: 8px; vertical-align: 3px; }
   .lukko { font-size: 12px; }
   .korostus { border-left: 4px solid var(--turkoosi); }
+  .klikattava { cursor: pointer; }
+  .klikattava:active { background: var(--kortti2); }
+  .ai { color: var(--turkoosi); font-size: 12px; font-weight: 600; margin-left: auto; }
+
+  /* Lukunäkymä (alhaalta nouseva arkki) */
+  .lukunakyma { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+  .lukunakyma .tausta { position: absolute; inset: 0; background: rgba(0,0,0,.6); }
+  .arkki { position: relative; width: 100%; max-width: 680px; max-height: 88vh; overflow-y: auto; background: var(--kortti);
+    border: 1px solid var(--raja); border-bottom: 0; border-radius: 20px 20px 0 0;
+    padding: 10px 20px calc(env(safe-area-inset-bottom) + 20px); animation: nousu .22s ease-out; }
+  @keyframes nousu { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+  .kahva { width: 42px; height: 5px; border-radius: 3px; background: var(--raja); margin: 0 auto 8px; cursor: pointer; }
+  .sulje { position: absolute; top: 8px; right: 10px; background: none; border: 0; color: var(--harmaa); font-size: 26px; padding: 4px 10px; cursor: pointer; }
+  .luku-otsikko { font-size: 21px; line-height: 1.3; margin: 4px 30px 14px 0; }
+  .luku-otsake { color: var(--turkoosi); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin: 16px 0 6px; }
+  .luku-teksti { font-size: 17px; line-height: 1.6; margin: 0; color: #DDE6EC; }
+  .pointit { margin: 0; padding-left: 20px; }
+  .pointit li { margin: 6px 0; line-height: 1.45; }
+  .pointit li::marker { color: var(--oranssi); }
+  .huom { background: rgba(245,154,27,.1); border-left: 3px solid var(--oranssi); padding: 10px 12px; border-radius: 8px;
+    font-size: 14.5px; color: #F2D6B0; margin-top: 14px; }
+  .luku-pieni { color: var(--harmaa); font-size: 12.5px; margin-top: 14px; }
+  .linkkinappi { display: block; text-align: center; margin-top: 18px; }
+
+  /* Ottelupäivä */
+  .ottelupaiva { background: linear-gradient(135deg, #10343B, #141C24 70%); border: 1px solid var(--turkoosi);
+    border-radius: 16px; padding: 14px 16px; margin: 6px 0 4px; }
+  .op-otsikko { color: var(--oranssi); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+  .op-rivi { display: flex; align-items: center; gap: 10px; margin: 12px 0 8px; }
+  .op-joukkue { flex: 1; font-weight: 700; font-size: 18px; text-align: center; line-height: 1.2; }
+  .op-joukkue.oma { color: var(--turkoosi); }
+  .op-tulos { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .op-tulos span { color: var(--harmaa); margin: 0 4px; }
+  .op-aika { font-size: 26px; font-weight: 800; color: var(--teksti); white-space: nowrap; }
+  .op-aika small { font-size: 14px; font-weight: 600; color: var(--harmaa); }
+  .op-ala { justify-content: center; margin-top: 4px; }
+  .merkki.live { animation: syke 1.6s infinite; }
+  @keyframes syke { 50% { opacity: .55; } }
+
+  /* Sarjataulukon rajat */
+  tr.pv td:first-child { box-shadow: inset 3px 0 var(--turkoosi); }
+  tr.pp td:first-child { box-shadow: inset 3px 0 rgba(51,193,212,.4); }
+  tr.ps td:first-child { box-shadow: inset 3px 0 var(--oranssi); }
+  tr.putoaa td:first-child { box-shadow: inset 3px 0 var(--tappio); }
+  tr.ps td { background: rgba(245,154,27,.05); }
+  tr.putoaa td { background: rgba(229,83,75,.08); }
+  tr.raja-pv td { border-bottom: 2px solid var(--turkoosi); }
+  tr.raja-pp td { border-bottom: 2px dashed var(--oranssi); }
+  tr.raja-ps td { border-bottom: 2px solid var(--tappio); }
+  .selite { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12.5px; color: var(--harmaa); }
+  .selite i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .s-pv { background: var(--turkoosi); } .s-pp { background: rgba(51,193,212,.4); }
+  .s-ps { background: var(--oranssi); } .s-pu { background: var(--tappio); }
+
   .tiivis { font-size: 16.5px; line-height: 1.55; }
   .viite { display: inline-flex; align-items: center; justify-content: center; min-width: 19px; height: 19px;
     padding: 0 5px; margin-left: 3px; border-radius: 6px; background: rgba(51,193,212,.16); color: var(--turkoosi);
@@ -188,6 +242,15 @@
   </nav>
 </div>
 
+
+<div id="lukunakyma" class="lukunakyma piilossa">
+  <div class="tausta" data-sulje></div>
+  <div class="arkki" role="dialog" aria-modal="true">
+    <div class="kahva" data-sulje></div>
+    <button class="sulje" data-sulje aria-label="Sulje">×</button>
+    <div id="lukusisalto"></div>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js';
@@ -355,14 +418,76 @@ $('#vaihdaprofiili').addEventListener('click', () => { tallennaProfiili(null); l
 $('#kirjauduulos').addEventListener('click', () => { tallennaProfiili(null); signOut(auth); });
 
 // ---------- Piirtäminen ----------
+const aiMerkki = (k) => k.tiiv && !k.tiiv.eiSaatavilla ? '<span class="ai">✦ Tiivistelmä</span>' : '';
+
 function uutisKortti(k) {
-  return `<a class="kortti${onUusi(k) ? ' uusi' : ''}" href="${esc(k.linkki)}" target="_blank" rel="noopener">
+  return `<div class="kortti klikattava${onUusi(k) ? ' uusi' : ''}" data-avaa="u:${esc(k.id)}" role="button" tabindex="0">
     <div class="otsikko">${esc(k.otsikko)}</div>
     ${k.kuvaus ? `<div class="kuvaus">${esc(k.kuvaus)}</div>` : ''}
     <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>${aikaTeksti(k.aika)}</span>
-      ${k.maksumuuri ? '<span class="lukko" title="Voi olla maksumuurin takana">🔒</span>' : ''}</div>
-  </a>`;
+      ${k.maksumuuri ? '<span class="lukko" title="Voi olla maksumuurin takana">🔒</span>' : ''}${aiMerkki(k)}</div>
+  </div>`;
 }
+
+// ---------- Lukunäkymä: tekoälyn tiivistelmä + linkki alkuperäiseen ----------
+let avoinna = null; // { laji: 'u' | 'k', id }
+
+function etsiKohde(laji, id) {
+  return laji === 'u' ? kohteet.find((k) => k.id === id) : ketjut.find((k) => k.id === id);
+}
+
+function piirraLukunakyma() {
+  if (!avoinna) return;
+  const k = etsiKohde(avoinna.laji, avoinna.id);
+  if (!k) { suljeLukunakyma(); return; }
+  const ketju = avoinna.laji === 'k';
+  const t = k.tiiv;
+  let runko;
+  if (t && !t.eiSaatavilla) {
+    runko = `
+      <div class="luku-otsake">✦ ${ketju ? 'Keskustelun tiivistelmä' : 'Tekoälyn tiivistelmä'}</div>
+      <p class="luku-teksti">${esc(t.teksti)}</p>
+      ${t.pointit?.length ? `<div class="luku-otsake">${ketju ? 'Puheenaiheet' : 'Tärkeimmät tiedot'}</div>
+        <ul class="pointit">${t.pointit.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
+      ${t.vajaa ? `<div class="huom">${ketju ? 'Ketjussa on vähän Pelicansia koskevaa keskustelua.' : 'Juttu on osittain maksumuurin takana – tiivistelmä perustuu jutun alkuun.'}</div>` : ''}
+      ${ketju ? '<div class="huom">Keskustelupalstan huhut ovat huhuja, eivät vahvistettua tietoa.</div>' : ''}
+      <div class="luku-pieni">Tiivistetty klo ${kello(t.tehty)} · tarkista tiedot alkuperäisestä</div>`;
+  } else if (t?.eiSaatavilla) {
+    runko = `${k.kuvaus ? `<p class="luku-teksti">${esc(k.kuvaus)}</p>` : ''}
+      <div class="huom">${esc(t.syy || 'Tiivistelmää ei voitu tehdä.')} Lue juttu alkuperäisestä lähteestä.</div>`;
+  } else {
+    runko = `${k.kuvaus ? `<p class="luku-teksti">${esc(k.kuvaus)}</p>` : ''}
+      <div class="huom">Tekoälyn tiivistelmä valmistuu seuraavan keräyksen yhteydessä (noin puolen tunnin sisällä).</div>`;
+  }
+  $('#lukusisalto').innerHTML = `
+    <div class="meta" style="margin:0 0 6px"><span>${esc(k.lahde)}</span><span>·</span>
+      <span>${ketju ? 'uutta ' + aikaTeksti(k.muuttunut) : aikaTeksti(k.aika)}</span>
+      ${k.maksumuuri ? '<span class="lukko">🔒</span>' : ''}</div>
+    <h3 class="luku-otsikko">${esc(k.otsikko)}</h3>
+    ${runko}
+    <a class="nappi linkkinappi" href="${esc(k.linkki)}" target="_blank" rel="noopener">${ketju ? 'Avaa keskustelu' : 'Avaa alkuperäinen juttu'} ↗</a>`;
+}
+
+function avaaLukunakyma(laji, id) {
+  avoinna = { laji, id };
+  piirraLukunakyma();
+  $('#lukunakyma').classList.remove('piilossa');
+  document.body.style.overflow = 'hidden';
+  history.pushState({ luku: true }, '');
+}
+function suljeLukunakyma() {
+  avoinna = null;
+  $('#lukunakyma').classList.add('piilossa');
+  document.body.style.overflow = '';
+}
+window.addEventListener('popstate', () => { if (avoinna) suljeLukunakyma(); });
+$('#lukunakyma').addEventListener('click', (e) => { if (e.target.closest('[data-sulje]')) history.back(); });
+$('main').addEventListener('click', (e) => {
+  const el = e.target.closest('[data-avaa]');
+  if (!el || e.target.closest('a')) return;
+  const [laji, ...id] = el.dataset.avaa.split(':');
+  avaaLukunakyma(laji, id.join(':'));
+});
 
 function tulosMerkki(o) {
   const oma = o.kotona ? o.kotiMaalit : o.vierasMaalit;
@@ -385,10 +510,97 @@ function otteluKortti(o, iso = false) {
 const ketjuUusi = (k) => raja > 0 && (k.muuttunut || 0) > raja;
 function ketjuKortti(k) {
   const maininta = !k.pelicansKetju && k.maininnat ? `<span>·</span><span>Pelicans mainittu ${k.maininnat} krt</span>` : '';
-  return `<a class="kortti${ketjuUusi(k) ? ' uusi' : ''}" href="${esc(k.linkki)}" target="_blank" rel="noopener">
+  return `<div class="kortti klikattava${ketjuUusi(k) ? ' uusi' : ''}" data-avaa="k:${esc(k.id)}" role="button" tabindex="0">
     <div class="otsikko">${esc(k.otsikko)}</div>
-    <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>uutta ${aikaTeksti(k.muuttunut)}</span>${maininta}</div>
-  </a>`;
+    <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>uutta ${aikaTeksti(k.muuttunut)}</span>${maininta}${aiMerkki(k)}</div>
+  </div>`;
+}
+
+// ---------- Ottelupäivä ja live-tilanne ----------
+const hkiPaiva = (t) => new Date(t).toLocaleDateString('fi-FI', { timeZone: 'Europe/Helsinki' });
+let live = {};          // ottelun id → tuorein tilanne suoraan Liigasta
+let liveAjastin = null;
+let liveToimii = null;  // null = ei kokeiltu, true/false
+
+function paivanOttelu() {
+  if (!ottelut) return null;
+  const tanaan = hkiPaiva(Date.now());
+  return [...(ottelut.pelatut || []), ...(ottelut.tulevat || [])].find((o) => o.aika && hkiPaiva(o.aika) === tanaan) || null;
+}
+
+async function haeLive() {
+  const o = paivanOttelu();
+  if (!o || document.hidden) return;
+  const osoitteet = [
+    `https://liiga.fi/api/v2/games/${ottelut.kausi}/${o.id}`,
+    `https://liiga.fi/api/v2/games?tournament=runkosarja&season=${ottelut.kausi}`,
+  ];
+  for (const url of osoitteet) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const d = await r.json();
+      const g = Array.isArray(d) ? d.find((x) => x.id === o.id) : (d.game || d);
+      if (!g?.homeTeam) continue;
+      live[o.id] = {
+        kotiMaalit: g.homeTeam.goals ?? o.kotiMaalit, vierasMaalit: g.awayTeam?.goals ?? o.vierasMaalit,
+        kaynnissa: !!g.started && !g.ended, paattynyt: !!g.ended, ratkaisu: g.finishedType || o.ratkaisu, haettu: Date.now(),
+      };
+      liveToimii = true;
+      piirra();
+      return;
+    } catch {}
+  }
+  liveToimii = false; // selain ei saanut tietoa suoraan Liigasta → näytetään keräyksen tieto
+}
+
+function hallitseLive() {
+  const o = paivanOttelu();
+  const nyt = Date.now();
+  const paattynyt = o && (o.paattynyt || live[o.id]?.paattynyt);
+  const aktiivinen = o && !paattynyt && nyt > o.aika - 15 * 60000 && nyt < o.aika + 5 * 3600e3 && liveToimii !== false;
+  if (aktiivinen && !liveAjastin) { haeLive(); liveAjastin = setInterval(haeLive, 60000); }
+  if (!aktiivinen && liveAjastin) { clearInterval(liveAjastin); liveAjastin = null; }
+}
+
+function alkuunTeksti(t) {
+  const min = Math.round((t - Date.now()) / 60000);
+  if (min <= 0) return 'alkaa hetkellä';
+  if (min < 60) return `alkuun ${min} min`;
+  return `alkuun ${Math.floor(min / 60)} h ${min % 60} min`;
+}
+
+function ottelupaivaKortti(o) {
+  const x = { ...o, ...(live[o.id] || {}) };
+  const oma = (n) => (/pelicans/i.test(n) ? ' oma' : '');
+  let keski, ala;
+  if (x.kaynnissa || x.paattynyt) {
+    keski = `<div class="op-tulos">${x.kotiMaalit ?? 0}<span>–</span>${x.vierasMaalit ?? 0}</div>`;
+    ala = x.kaynnissa
+      ? `<span class="merkki live">KÄYNNISSÄ</span><span>${live[o.id]?.haettu ? 'päivitetty ' + kello(live[o.id].haettu) : 'päivittyy keräyksen mukana'}</span>`
+      : `${tulosMerkki(x)}<span>Lopputulos</span>`;
+  } else {
+    keski = `<div class="op-aika"><small>klo</small> ${kello(x.aika)}</div>`;
+    ala = `<span>${alkuunTeksti(x.aika)}</span>`;
+  }
+  return `<div class="ottelupaiva">
+    <div class="op-otsikko">● Ottelupäivä</div>
+    <div class="op-rivi"><div class="op-joukkue${oma(x.koti)}">${esc(x.koti)}</div>${keski}<div class="op-joukkue${oma(x.vieras)}">${esc(x.vieras)}</div></div>
+    <div class="meta op-ala">${ala}</div>
+  </div>`;
+}
+
+// ---------- Sarjataulukko: rajat kaudelle 2026–27 (17 joukkuetta) ----------
+// 1–4 suoraan puolivälieriin, 5–12 pudotuspelien 1. kierros, 13–16 putoamissarja, 17. putoaa suoraan
+const SARJA = { suoraanPV: 4, pudotuspelit: 12, putoamissarja: 16 };
+function taulukonRivi(r, i, kaikki) {
+  const sija = Number(r.sija) || i + 1;
+  const luokat = [/pelicans/i.test(r.joukkue) ? 'oma' : ''];
+  luokat.push(sija <= SARJA.suoraanPV ? 'pv' : sija <= SARJA.pudotuspelit ? 'pp' : sija <= SARJA.putoamissarja ? 'ps' : 'putoaa');
+  if (sija === SARJA.suoraanPV) luokat.push('raja-pv');
+  if (sija === SARJA.pudotuspelit) luokat.push('raja-pp');
+  if (sija === SARJA.putoamissarja && kaikki.length > SARJA.putoamissarja) luokat.push('raja-ps');
+  return `<tr class="${luokat.join(' ')}"><td>${esc(sija)}</td><td>${esc(r.joukkue)}</td><td>${esc(r.ottelut ?? '')}</td><td>${esc(r.pisteet ?? '')}</td></tr>`;
 }
 
 // Tiivistelmän lähdeviitteet [3] tai [2, 5] → pienet linkit
@@ -438,8 +650,10 @@ function piirra() {
   asetaLaskuri('keskustelut', ketjutJarj.filter(ketjuUusi).length);
 
   // Kooste
-  const seuraava = ottelut?.tulevat?.[0];
+  const paivan = paivanOttelu();
+  const seuraava = ottelut?.tulevat?.find((o) => o.id !== paivan?.id);
   $('[data-nakyma="kooste"]').innerHTML = `
+    ${paivan ? ottelupaivaKortti(paivan) : ''}
     <h2>Päivän Pelicans</h2>
     ${tiivistelmaKortti(tiivistelma?.uutiset)}
     ${uusia ? `<div class="vihje">Edellisen käyntisi jälkeen on tullut <b>${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.</div>` : ''}
@@ -470,15 +684,24 @@ function piirra() {
   if (!ottelut) {
     $('[data-nakyma="ottelut"]').innerHTML = tyhja('Ei vielä otteluita', 'Tiedot haetaan Liigasta keräyksen yhteydessä.');
   } else {
-    const taulukko = (ottelut.sarjataulukko || []).map((r) => `<tr class="${/pelicans/i.test(r.joukkue) ? 'oma' : ''}">
-      <td>${esc(r.sija)}</td><td>${esc(r.joukkue)}</td><td>${esc(r.ottelut ?? '')}</td><td>${esc(r.pisteet ?? '')}</td></tr>`).join('');
+    const rivit = ottelut.sarjataulukko || [];
+    const taulukko = rivit.map(taulukonRivi).join('');
     $('[data-nakyma="ottelut"]').innerHTML = `
+      ${paivan ? ottelupaivaKortti(paivan) : ''}
       ${ottelut.tulevat?.length ? `<h2>Tulevat</h2>${otteluKortti(ottelut.tulevat[0], true)}${ottelut.tulevat.slice(1).map((o) => otteluKortti(o)).join('')}` : ''}
       ${ottelut.pelatut?.length ? `<h2>Viimeisimmät</h2>${ottelut.pelatut.map((o) => otteluKortti(o)).join('')}` : ''}
       ${taulukko ? `<h2>Sarjataulukko</h2><div class="kortti"><table>
-        <thead><tr><th>#</th><th>Joukkue</th><th>O</th><th>P</th></tr></thead><tbody>${taulukko}</tbody></table></div>` : ''}
+        <thead><tr><th>#</th><th>Joukkue</th><th>O</th><th>P</th></tr></thead><tbody>${taulukko}</tbody></table>
+        <div class="selite">
+          <span><i class="s-pv"></i>1–${SARJA.suoraanPV} suoraan puolivälieriin</span>
+          <span><i class="s-pp"></i>${SARJA.suoraanPV + 1}–${SARJA.pudotuspelit} pudotuspelit</span>
+          <span><i class="s-ps"></i>${SARJA.pudotuspelit + 1}–${SARJA.putoamissarja} putoamissarja</span>
+          ${rivit.length > SARJA.putoamissarja ? `<span><i class="s-pu"></i>${SARJA.putoamissarja + 1}. putoaa suoraan</span>` : ''}
+        </div></div>` : ''}
     `;
   }
+  piirraLukunakyma();
+  hallitseLive();
 }
 
 // Suhteelliset ajat ("5 min sitten") pysyvät ajan tasalla

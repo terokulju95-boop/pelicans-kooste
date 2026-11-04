@@ -16,6 +16,14 @@
     "kuvaus": false
   },
   {
+    "id": "google-jatkoaika",
+    "nimi": "Jatkoaika",
+    "tyyppi": "uutinen",
+    "url": "https://news.google.com/rss/search?q=Pelicans+site:jatkoaika.com&hl=fi&gl=FI&ceid=FI:fi",
+    "google": true,
+    "kuvaus": false
+  },
+  {
     "id": "is",
     "nimi": "Ilta-Sanomat",
     "tyyppi": "uutinen",
@@ -43,5 +51,15 @@
     "url": "https://www.ess.fi/feed/rss",
     "kuvaus": true,
     "maksumuuri": true
+  },
+  {
+    "id": "pelicans-fi",
+    "nimi": "Pelicans.fi",
+    "tyyppi": "uutinen",
+    "tapa": "pelicansfi",
+    "sivut": [
+      "https://www.pelicans.fi/",
+      "https://www.pelicans.fi/uutiset"
+    ]
   }
 ]

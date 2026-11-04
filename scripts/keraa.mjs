@@ -11,7 +11,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 const UA = 'pelicans-kooste/1.0 (yksityinen sovellus)';
 const SAILYTYS_PV = 30;
-const MAX_KOHTEITA = 400;
+const MAX_KOHTEITA = 300; // pitää Firestore-dokumentin reilusti alle 1 Mt:n myös tiivistelmien kanssa
 const KUVAUS_MAX = 200;
 
 const lue = (polku) => JSON.parse(readFileSync(new URL(polku, import.meta.url), 'utf8'));
@@ -68,8 +68,33 @@ function lahdeNimi(item) {
   return typeof s === 'string' ? s : (s._ || null);
 }
 
+// ---------- Pelicans.fi (ei syötettä: luetaan uutislinkit sivulta) ----------
+async function haePelicansFi(lahde) {
+  const loydetyt = new Map();
+  for (const sivu of lahde.sivut) {
+    let html;
+    try { html = await hae(sivu); } catch (e) { console.warn(`  ${sivu}: ${e.message}`); continue; }
+    for (const m of html.matchAll(/<a\b[^>]*href="([^"#]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
+      let url;
+      try { url = new URL(m[1].replace(/&amp;/g, '&'), sivu); } catch { continue; }
+      if (!/(^|\.)pelicans\.fi$/i.test(url.hostname)) continue;
+      if (!/\/(uutiset|uutinen|news|artikkeli|tiedote|tiedotteet)\/[^/]+/i.test(url.pathname)) continue;
+      const teksti = puhdas(m[2]);
+      if (teksti.length < 15) continue;
+      const avainUrl = url.origin + url.pathname.replace(/\/$/, '');
+      if (!loydetyt.has(avainUrl) || teksti.length > loydetyt.get(avainUrl).length) loydetyt.set(avainUrl, teksti);
+    }
+  }
+  console.log(`  pelicans.fi: ${loydetyt.size} uutislinkkiä`, [...loydetyt.values()].slice(0, 3).join(' | '));
+  return [...loydetyt].slice(0, 15).map(([linkki, otsikko], i) => ({
+    id: hajautus(linkki), tyyppi: 'uutinen', lahde: 'Pelicans.fi', otsikko: otsikko.slice(0, 160), kuvaus: '',
+    linkki, aika: null, aikaArvio: true, jarjestys: i, google: false, maksumuuri: false,
+  }));
+}
+
 // ---------- Uutisten keräys ----------
 async function keraaLahde(lahde) {
+  if (lahde.tapa === 'pelicansfi') return haePelicansFi(lahde);
   const xml = await hae(lahde.url);
   const syote = await parser.parseString(xml);
   const tulos = [];
@@ -118,11 +143,15 @@ async function paivitaUutiset() {
     try {
       const uudet = await keraaLahde(lahde);
       console.log(`${lahde.id}: ${uudet.length} Pelicans-kohdetta`);
+      // Pelicans.fi:n ensimmäisellä kerralla vanhoja tiedotteita ei merkitä uusiksi eikä nosteta listan kärkeen
+      const ekaKerta = lahde.tapa === 'pelicansfi' && !kohteet.some((k) => k.lahde === 'Pelicans.fi');
       for (const u of uudet) {
         const a = avain(u.otsikko);
-        const olemassa = avaimet.get(a);
+        const olemassa = avaimet.get(a) || kohteet.find((k) => k.id === u.id);
         if (!olemassa) {
-          const k = { ...u, lisatty: nyt };
+          if (u.aika == null) u.aika = ekaKerta ? nyt - 3 * 864e5 - u.jarjestys * 60000 : nyt;
+          delete u.jarjestys;
+          const k = { ...u, lisatty: ekaKerta ? 0 : nyt };
           kohteet.push(k);
           avaimet.set(a, k);
           lisatty++;
