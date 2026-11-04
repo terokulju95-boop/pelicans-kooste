@@ -1,0 +1,12 @@
+{
+  "name": "pelicans-kooste",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "keraa": "node scripts/keraa.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "rss-parser": "^3.13.0"
+  }
+}

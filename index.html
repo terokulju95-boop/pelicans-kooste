@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1117">
+<title>Pelicans-kooste</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="kuvakkeet/icon-192.png">
+<link rel="apple-touch-icon" href="kuvakkeet/apple-touch-icon.png">
+<style>
+  :root {
+    --tausta: #0B1117;
+    --kortti: #141C24;
+    --kortti2: #1B2530;
+    --raja: #24313D;
+    --turkoosi: #33C1D4;
+    --oranssi: #F59A1B;
+    --teksti: #EAF2F5;
+    --harmaa: #8A9AA8;
+    --voitto: #3CCB7F;
+    --tappio: #E5534B;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--tausta); color: var(--teksti);
+    font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  .piilossa { display: none !important; }
+
+  /* Yläpalkki */
+  header { position: sticky; top: 0; z-index: 5; background: var(--tausta);
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 10px; border-bottom: 1px solid var(--raja);
+    display: flex; align-items: center; gap: 12px; }
+  header img { width: 34px; height: 34px; border-radius: 8px; }
+  header .nimi { font-weight: 700; font-size: 19px; color: var(--turkoosi); line-height: 1.1; }
+  header .aika { font-size: 13px; color: var(--harmaa); }
+  header .tila { flex: 1; }
+  .ikoninappi { background: none; border: 0; padding: 8px; border-radius: 10px; color: var(--harmaa); cursor: pointer; }
+  .ikoninappi:active { background: var(--kortti2); }
+
+  main { padding: 12px 12px calc(env(safe-area-inset-bottom) + 84px); max-width: 680px; margin: 0 auto; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--harmaa);
+    margin: 22px 4px 10px; font-weight: 600; }
+  h2:first-child { margin-top: 6px; }
+
+  /* Kortit */
+  .kortti { display: block; background: var(--kortti); border: 1px solid var(--raja); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px; position: relative; }
+  a.kortti:active { background: var(--kortti2); }
+  .kortti .otsikko { font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .kortti .kuvaus { color: #C3CED6; font-size: 15px; margin-top: 6px; }
+  .kortti .meta { color: var(--harmaa); font-size: 13px; margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .kortti.uusi { border-color: rgba(245,154,27,.55); }
+  .piste { width: 9px; height: 9px; border-radius: 50%; background: var(--oranssi); display: inline-block; flex: none; }
+  .kortti.uusi .otsikko::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--oranssi); margin-right: 8px; vertical-align: 3px; }
+  .lukko { font-size: 12px; }
+  .korostus { border-left: 4px solid var(--turkoosi); }
+  .tyhja { color: var(--harmaa); text-align: center; padding: 34px 16px; }
+  .tyhja b { color: var(--teksti); display: block; margin-bottom: 6px; font-size: 17px; }
+
+  /* Ottelut */
+  .ottelu { display: flex; align-items: center; gap: 12px; }
+  .ottelu .joukkueet { flex: 1; font-weight: 600; }
+  .ottelu .tulos { font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .merkki { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+  .merkki.v { background: rgba(60,203,127,.15); color: var(--voitto); }
+  .merkki.t { background: rgba(229,83,75,.15); color: var(--tappio); }
+  .merkki.live { background: var(--oranssi); color: #000; }
+  .iso { font-size: 22px; font-weight: 700; margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th { color: var(--harmaa); font-weight: 500; font-size: 12px; text-align: right; padding: 4px 6px; }
+  td { padding: 8px 6px; text-align: right; border-top: 1px solid var(--raja); }
+  th:nth-child(2), td:nth-child(2) { text-align: left; }
+  tr.oma td { color: var(--turkoosi); font-weight: 700; }
+
+  /* Alapalkki */
+  nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 5; background: rgba(11,17,23,.97);
+    border-top: 1px solid var(--raja); display: flex; padding-bottom: env(safe-area-inset-bottom); }
+  nav button { flex: 1; background: none; border: 0; padding: 9px 2px 8px; color: var(--harmaa);
+    font-size: 11.5px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; position: relative; }
+  nav button svg { width: 24px; height: 24px; }
+  nav button.valittu { color: var(--turkoosi); }
+  nav button[data-valilehti="huhut"].valittu { color: var(--oranssi); }
+  .laskuri { position: absolute; top: 4px; left: calc(50% + 6px); background: var(--oranssi); color: #000;
+    font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px;
+    display: flex; align-items: center; justify-content: center; }
+
+  /* Kirjautuminen ja profiili */
+  .keskitetty { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .keskitetty img { width: 96px; height: 96px; border-radius: 22px; margin-bottom: 18px; }
+  .keskitetty h1 { color: var(--turkoosi); margin: 0 0 22px; font-size: 26px; }
+  form, .valinnat { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; }
+  input { font: inherit; padding: 14px 14px; border-radius: 12px; border: 1px solid var(--raja);
+    background: var(--kortti); color: var(--teksti); }
+  input:focus { outline: 2px solid var(--turkoosi); border-color: transparent; }
+  .nappi { background: var(--turkoosi); color: #00151A; border: 0; border-radius: 12px; padding: 14px;
+    font-weight: 700; cursor: pointer; font-size: 17px; }
+  .nappi.toissijainen { background: var(--kortti2); color: var(--teksti); }
+  .nappi:disabled { opacity: .6; }
+  .virhe { color: var(--tappio); font-size: 15px; min-height: 22px; text-align: center; }
+
+  /* Valikko ja päivitysilmoitus */
+  .valikko { position: fixed; top: calc(env(safe-area-inset-top) + 60px); right: 12px; z-index: 10; background: var(--kortti2);
+    border: 1px solid var(--raja); border-radius: 12px; padding: 6px; min-width: 210px; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+  .valikko button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 12px; border-radius: 8px; cursor: pointer; }
+  .valikko button:active { background: var(--raja); }
+  .valikko .info { color: var(--harmaa); font-size: 13px; padding: 8px 12px 4px; }
+  .ilmoitus { position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 76px); z-index: 20;
+    background: var(--turkoosi); color: #00151A; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+    font-weight: 600; max-width: 656px; margin: 0 auto; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+  .ilmoitus span { flex: 1; }
+  .ilmoitus button { background: #00151A; color: var(--turkoosi); border: 0; border-radius: 10px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- Kirjautuminen -->
+<section id="kirjautuminen" class="keskitetty piilossa">
+  <img src="kuvakkeet/icon-192.png" alt="">
+  <h1>Pelicans-kooste</h1>
+  <form id="kirjautumislomake">
+    <input id="sposti" type="email" autocomplete="username" placeholder="Sähköposti" required>
+    <input id="salasana" type="password" autocomplete="current-password" placeholder="Salasana" required>
+    <button class="nappi" type="submit">Kirjaudu</button>
+    <div class="virhe" id="kirjautumisvirhe"></div>
+  </form>
+</section>
+
+<!-- Profiilin valinta (yhteinen tunnus, omat "uusi"-merkit) -->
+<section id="profiilivalinta" class="keskitetty piilossa">
+  <img src="kuvakkeet/icon-192.png" alt="">
+  <h1>Kuka käyttää?</h1>
+  <div class="valinnat">
+    <button class="nappi" data-profiili="tero">Tero</button>
+    <button class="nappi" data-profiili="veli">Veli</button>
+  </div>
+</section>
+
+<!-- Sovellus -->
+<div id="sovellus" class="piilossa">
+  <header>
+    <img src="kuvakkeet/icon-192.png" alt="">
+    <div class="tila">
+      <div class="nimi">Pelicans-kooste</div>
+      <div class="aika" id="paivitetty">Ladataan…</div>
+    </div>
+    <button class="ikoninappi" id="valikkonappi" aria-label="Valikko">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+    </button>
+  </header>
+
+  <div class="valikko piilossa" id="valikko">
+    <div class="info" id="valikkoinfo"></div>
+    <button id="vaihdaprofiili">Vaihda käyttäjää</button>
+    <button id="kirjauduulos">Kirjaudu ulos</button>
+  </div>
+
+  <main>
+    <section data-nakyma="kooste"></section>
+    <section data-nakyma="uutiset" class="piilossa"></section>
+    <section data-nakyma="huhut" class="piilossa"></section>
+    <section data-nakyma="keskustelut" class="piilossa"></section>
+    <section data-nakyma="ottelut" class="piilossa"></section>
+  </main>
+
+  <nav>
+    <button data-valilehti="kooste" class="valittu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Kooste</button>
+    <button data-valilehti="uutiset">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>Uutiset<span class="laskuri piilossa" data-laskuri="uutiset"></span></button>
+    <button data-valilehti="huhut">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M12 8v4M12 16h.01"/></svg>Huhut</button>
+    <button data-valilehti="keskustelut">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h12v8H8l-4 3z"/><path d="M16 9h4v8l-3-2h-7v-2"/></svg>Keskustelut</button>
+    <button data-valilehti="ottelut">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="14" rx="8" ry="3.5"/><path d="M4 14v-3c0-1.9 3.6-3.5 8-3.5s8 1.6 8 3.5v3"/></svg>Ottelut</button>
+  </nav>
+</div>
+
+<div class="ilmoitus piilossa" id="paivitysilmoitus">
+  <span>Uusi versio saatavilla</span>
+  <button id="paivitanappi">Päivitä</button>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
+  from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js';
+import { initializeFirestore, persistentLocalCache, doc, onSnapshot, getDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAOTAEzO091EFVkDgut5lVt9u_zH1pl2pM",
+  authDomain: "pelicans-kooste.firebaseapp.com",
+  projectId: "pelicans-kooste",
+  storageBucket: "pelicans-kooste.firebasestorage.app",
+  messagingSenderId: "567785598357",
+  appId: "1:567785598357:web:015b4aa3649048d3b5da9c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const nakymat = ['kirjautuminen', 'profiilivalinta', 'sovellus'];
+const nayta = (id) => nakymat.forEach((n) => $('#' + n).classList.toggle('piilossa', n !== id));
+
+const PROFIILIT = { tero: 'Tero', veli: 'Veli' };
+const lueProfiili = () => { try { return localStorage.getItem('profiili'); } catch { return null; } };
+const tallennaProfiili = (p) => { try { p ? localStorage.setItem('profiili', p) : localStorage.removeItem('profiili'); } catch {} };
+
+let kayttaja = null;
+let raja = 0;              // "uusi" = lisätty tämän jälkeen
+let istunnonAlku = Date.now();
+let piilotettu = 0;
+let kohteet = [];
+let ottelut = null;
+let paivitysAika = null;
+let kuuntelijat = [];
+
+// ---------- Apurit ----------
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const kello = (t) => new Date(t).toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' }).replace(':', '.');
+function aikaTeksti(t) {
+  const ero = Date.now() - t;
+  const min = Math.round(ero / 60000);
+  if (min < 1) return 'juuri nyt';
+  if (min < 60) return `${min} min sitten`;
+  const d = new Date(t), nyt = new Date();
+  const paiva = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const erot = Math.round((paiva(nyt) - paiva(d)) / 864e5);
+  if (erot === 0) return `tänään ${kello(t)}`;
+  if (erot === 1) return `eilen ${kello(t)}`;
+  return `${d.getDate()}.${d.getMonth() + 1}. ${kello(t)}`;
+}
+function otteluAika(t) {
+  const d = new Date(t);
+  const vk = d.toLocaleDateString('fi-FI', { weekday: 'short' });
+  return `${vk} ${d.getDate()}.${d.getMonth() + 1}. klo ${kello(t)}`;
+}
+const onUusi = (k) => raja > 0 && (k.lisatty || 0) > raja;
+
+// ---------- Kirjautuminen ----------
+$('#kirjautumislomake').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nappi = e.target.querySelector('button');
+  nappi.disabled = true;
+  $('#kirjautumisvirhe').textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, $('#sposti').value.trim(), $('#salasana').value);
+  } catch (err) {
+    const viestit = {
+      'auth/invalid-credential': 'Väärä sähköposti tai salasana.',
+      'auth/invalid-email': 'Sähköpostiosoite ei kelpaa.',
+      'auth/too-many-requests': 'Liian monta yritystä. Odota hetki.',
+      'auth/network-request-failed': 'Ei verkkoyhteyttä.',
+    };
+    $('#kirjautumisvirhe').textContent = viestit[err.code] || 'Kirjautuminen epäonnistui.';
+  } finally { nappi.disabled = false; }
+});
+
+$$('[data-profiili]').forEach((b) => b.addEventListener('click', () => {
+  tallennaProfiili(b.dataset.profiili);
+  kaynnista();
+}));
+
+onAuthStateChanged(auth, (u) => {
+  kayttaja = u;
+  if (!u) { lopetaKuuntelu(); nayta('kirjautuminen'); return; }
+  if (!lueProfiili()) { nayta('profiilivalinta'); return; }
+  kaynnista();
+});
+
+// ---------- Käynnistys ja "uusi"-merkit ----------
+const profiiliRef = () => doc(db, 'kayttajat', kayttaja.uid, 'profiilit', lueProfiili());
+
+async function aloitaIstunto() {
+  try {
+    const s = await getDoc(profiiliRef());
+    raja = s.exists() ? (s.data().edellinen || 0) : 0;
+  } catch { raja = 0; }
+  istunnonAlku = Date.now();
+  setDoc(profiiliRef(), { edellinen: istunnonAlku }, { merge: true }).catch(() => {});
+}
+
+async function kaynnista() {
+  nayta('sovellus');
+  $('#valikkoinfo').textContent = `Käyttäjä: ${PROFIILIT[lueProfiili()] || '?'}`;
+  await aloitaIstunto();
+  lopetaKuuntelu();
+  kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'kohteet'), (s) => {
+    const d = s.data() || {};
+    kohteet = d.kohteet || [];
+    paivitysAika = Math.max(d.paivitetty || 0, d.tarkistettu || 0) || null;
+    piirra();
+  }, virheKuuntelussa));
+  kuuntelijat.push(onSnapshot(doc(db, 'kooste', 'ottelut'), (s) => {
+    ottelut = s.data() || null;
+    piirra();
+  }, virheKuuntelussa));
+  piirra();
+}
+
+function virheKuuntelussa(err) {
+  console.error(err);
+  $('#paivitetty').textContent = err.code === 'permission-denied'
+    ? 'Ei lukuoikeutta – tarkista Firestoren säännöt' : 'Yhteysvirhe';
+}
+
+function lopetaKuuntelu() { kuuntelijat.forEach((f) => f()); kuuntelijat = []; }
+
+// Kun sovellus palaa taustalta yli 10 min jälkeen, alkaa uusi "käynti"
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { piilotettu = Date.now(); return; }
+  if (kayttaja && lueProfiili() && piilotettu && Date.now() - piilotettu > 10 * 60000) {
+    raja = istunnonAlku;
+    istunnonAlku = Date.now();
+    setDoc(profiiliRef(), { edellinen: istunnonAlku }, { merge: true }).catch(() => {});
+    piirra();
+  }
+});
+
+// ---------- Valilehdet ----------
+let valittu = 'kooste';
+$$('nav button').forEach((b) => b.addEventListener('click', () => {
+  valittu = b.dataset.valilehti;
+  $$('nav button').forEach((x) => x.classList.toggle('valittu', x === b));
+  $$('[data-nakyma]').forEach((s) => s.classList.toggle('piilossa', s.dataset.nakyma !== valittu));
+  window.scrollTo(0, 0);
+}));
+
+// ---------- Valikko ----------
+$('#valikkonappi').addEventListener('click', (e) => { e.stopPropagation(); $('#valikko').classList.toggle('piilossa'); });
+document.addEventListener('click', () => $('#valikko').classList.add('piilossa'));
+$('#vaihdaprofiili').addEventListener('click', () => { tallennaProfiili(null); lopetaKuuntelu(); nayta('profiilivalinta'); });
+$('#kirjauduulos').addEventListener('click', () => { tallennaProfiili(null); signOut(auth); });
+
+// ---------- Piirtäminen ----------
+function uutisKortti(k) {
+  return `<a class="kortti${onUusi(k) ? ' uusi' : ''}" href="${esc(k.linkki)}" target="_blank" rel="noopener">
+    <div class="otsikko">${esc(k.otsikko)}</div>
+    ${k.kuvaus ? `<div class="kuvaus">${esc(k.kuvaus)}</div>` : ''}
+    <div class="meta"><span>${esc(k.lahde)}</span><span>·</span><span>${aikaTeksti(k.aika)}</span>
+      ${k.maksumuuri ? '<span class="lukko" title="Voi olla maksumuurin takana">🔒</span>' : ''}</div>
+  </a>`;
+}
+
+function tulosMerkki(o) {
+  const oma = o.kotona ? o.kotiMaalit : o.vierasMaalit;
+  const vast = o.kotona ? o.vierasMaalit : o.kotiMaalit;
+  const r = String(o.ratkaisu || '').toUpperCase();
+  const lisa = r.includes('SHOT') || r.includes('SHOOTOUT') ? ' vl' : r.includes('EXTENDED') || r.includes('OVERTIME') ? ' ja' : '';
+  if (oma == null || vast == null) return '';
+  return oma > vast ? `<span class="merkki v">V${lisa}</span>` : `<span class="merkki t">T${lisa}</span>`;
+}
+
+function otteluKortti(o, iso = false) {
+  const tulos = o.paattynyt || o.kaynnissa ? `<div class="tulos">${o.kotiMaalit ?? 0}–${o.vierasMaalit ?? 0}</div>` : '';
+  const tila = o.kaynnissa ? '<span class="merkki live">KÄYNNISSÄ</span>' : o.paattynyt ? tulosMerkki(o) : '';
+  return `<div class="kortti${iso ? ' korostus' : ''}">
+    <div class="ottelu"><div class="joukkueet">${esc(o.koti)} – ${esc(o.vieras)}</div>${tulos}</div>
+    <div class="meta"><span>${o.aika ? otteluAika(o.aika) : ''}</span>${tila}</div>
+  </div>`;
+}
+
+const tyhja = (otsikko, teksti) => `<div class="tyhja"><b>${otsikko}</b>${teksti}</div>`;
+
+function piirra() {
+  const uutiset = kohteet.filter((k) => k.tyyppi === 'uutinen').sort((a, b) => b.aika - a.aika);
+  const uusia = uutiset.filter(onUusi).length;
+
+  // Yläpalkki ja laskuri
+  if (paivitysAika) $('#paivitetty').textContent = `Päivitetty klo ${kello(paivitysAika)}`;
+  const laskuri = $('[data-laskuri="uutiset"]');
+  laskuri.textContent = uusia;
+  laskuri.classList.toggle('piilossa', !uusia);
+
+  // Kooste
+  const seuraava = ottelut?.tulevat?.[0];
+  $('[data-nakyma="kooste"]').innerHTML = `
+    <h2>Päivän Pelicans</h2>
+    <div class="kortti korostus"><div class="kuvaus" style="margin:0">Tekoälyn tiivistelmä tulee tähän myöhemmin (vaihe 4).
+      ${uusia ? `Edellisen käyntisi jälkeen on tullut <b style="color:var(--oranssi)">${uusia === 1 ? '1 uusi uutinen' : uusia + ' uutta uutista'}</b>.` : ''}</div></div>
+    ${seuraava ? `<h2>Seuraava ottelu</h2>${otteluKortti(seuraava, true)}` : ''}
+    <h2>Tuoreimmat uutiset</h2>
+    ${uutiset.slice(0, 3).map(uutisKortti).join('') || tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.')}
+  `;
+
+  // Uutiset
+  $('[data-nakyma="uutiset"]').innerHTML = uutiset.length
+    ? `<h2>Uutiset · ${uutiset.length}</h2>` + uutiset.map(uutisKortti).join('')
+    : tyhja('Ei vielä uutisia', 'Keräys täyttää listan ensimmäisellä ajolla.');
+
+  // Huhut ja keskustelut (vaiheet 3–4)
+  $('[data-nakyma="huhut"]').innerHTML = tyhja('Huhumylly tulossa', 'Huhujen tiivistelmä tulee tähän vaiheessa 4.');
+  const keskustelut = kohteet.filter((k) => k.tyyppi === 'keskustelu');
+  $('[data-nakyma="keskustelut"]').innerHTML = keskustelut.length
+    ? keskustelut.map(uutisKortti).join('')
+    : tyhja('Keskustelut tulossa', 'Keskustelupalstat lisätään vaiheessa 3.');
+
+  // Ottelut
+  if (!ottelut) {
+    $('[data-nakyma="ottelut"]').innerHTML = tyhja('Ei vielä otteluita', 'Tiedot haetaan Liigasta keräyksen yhteydessä.');
+  } else {
+    const taulukko = (ottelut.sarjataulukko || []).map((r) => `<tr class="${/pelicans/i.test(r.joukkue) ? 'oma' : ''}">
+      <td>${esc(r.sija)}</td><td>${esc(r.joukkue)}</td><td>${esc(r.ottelut ?? '')}</td><td>${esc(r.pisteet ?? '')}</td></tr>`).join('');
+    $('[data-nakyma="ottelut"]').innerHTML = `
+      ${ottelut.tulevat?.length ? `<h2>Tulevat</h2>${otteluKortti(ottelut.tulevat[0], true)}${ottelut.tulevat.slice(1).map((o) => otteluKortti(o)).join('')}` : ''}
+      ${ottelut.pelatut?.length ? `<h2>Viimeisimmät</h2>${ottelut.pelatut.map((o) => otteluKortti(o)).join('')}` : ''}
+      ${taulukko ? `<h2>Sarjataulukko</h2><div class="kortti"><table>
+        <thead><tr><th>#</th><th>Joukkue</th><th>O</th><th>P</th></tr></thead><tbody>${taulukko}</tbody></table></div>` : ''}
+    `;
+  }
+}
+
+// Suhteelliset ajat ("5 min sitten") pysyvät ajan tasalla
+setInterval(() => { if (!document.hidden && kayttaja) piirra(); }, 60000);
+
+// ---------- Päivitykset (service worker) ----------
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    const ilmoita = () => $('#paivitysilmoitus').classList.remove('piilossa');
+    if (reg.waiting) ilmoita();
+    reg.addEventListener('updatefound', () => {
+      const uusi = reg.installing;
+      uusi?.addEventListener('statechange', () => {
+        if (uusi.state === 'installed' && navigator.serviceWorker.controller) ilmoita();
+      });
+    });
+    $('#paivitanappi').addEventListener('click', () => reg.waiting?.postMessage('PAIVITA'));
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+  });
+  let ladattu = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!ladattu) { ladattu = true; location.reload(); }
+  });
+}
+</script>
+</body>
+</html>
